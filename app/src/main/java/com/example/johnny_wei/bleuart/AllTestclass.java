@@ -3567,6 +3567,7 @@ public class AllTestclass extends AppCompatActivity {
         return true;
     }
 
+    //new version of invoke
     public int BD_AddrWrite(BLE_testItem testItem)
     {
         Log.d(TAG, "gettestName:" + testItem.gettestName());
@@ -3702,6 +3703,153 @@ public class AllTestclass extends AppCompatActivity {
         return 0;
     }
     public int BD_phy(BLE_testItem testItem)
+    {
+        Log.d(TAG, "\nfunc----------------------S");
+        Log.d(TAG, "gettestName:" + testItem.gettestName());
+        Log.d(TAG, "data:" + testItem.getdataStr());
+        Log.d(TAG, "cmd" + testItem.getCmd());
+        testItem.popCmd();
+        Log.d(TAG, "cmd:" + testItem.getCmd());
+        Log.d(TAG, "func----------------------E");
+        return 0;
+    }
+
+    //air
+    public int AIR_BD_AddrWrite(BLE_testItem testItem)
+    {
+        Log.d(TAG, "gettestName:" + testItem.gettestName());
+        Log.d(TAG, "data:" + testItem.getdataStr());
+        Log.d(TAG, "cmd" + testItem.getCmd());
+        testItem.popCmd();
+        Log.d(TAG, "cmd:" + testItem.getCmd());
+        return 0;
+    }
+
+    public int AIR_BD_IntvWrite(BLE_testItem testItem)
+    {
+        Log.d(TAG, "\nfunc----------------------S");
+        Log.d(TAG, "gettestName:" + testItem.gettestName());
+        Log.d(TAG, "data:" + testItem.getdataStr());
+        Log.d(TAG, "cmd" + testItem.getCmd());
+        testItem.popCmd();
+        Log.d(TAG, "cmd:" + testItem.getCmd());
+        Log.d(TAG, "func----------------------E");
+        return 0;
+    }
+
+    public int AIR_BD_NameWrite(BLE_testItem testItem)
+    {
+        Log.d(TAG, "\nfunc----------------------S");
+        Log.d(TAG, "gettestName:" + testItem.gettestName());
+        Log.d(TAG, "data:" + testItem.getdataStr());
+        Log.d(TAG, "cmd" + testItem.getCmd());
+        testItem.popCmd();
+        Log.d(TAG, "cmd:" + testItem.getCmd());
+        Log.d(TAG, "func----------------------E");
+        return 0;
+    }
+
+    public int AIR_BD_AdvDataWrite(BLE_testItem testItem)
+    {
+        Log.d(TAG, "\nfunc----------------------S");
+        Log.d(TAG, "gettestName:" + testItem.gettestName());
+        Log.d(TAG, "data:" + testItem.getdataStr());
+        Log.d(TAG, "cmd" + testItem.getCmd());
+        testItem.popCmd();
+        Log.d(TAG, "cmd:" + testItem.getCmd());
+        Log.d(TAG, "func----------------------E");
+        return 0;
+    }
+
+    public int AIR_BD_WhiteListWrite(BLE_testItem testItem)
+    {
+        Log.d(TAG, "\nfunc----------------------S");
+        Log.d(TAG, "gettestName:" + testItem.gettestName());
+        Log.d(TAG, "data:" + testItem.getdataStr());
+        Log.d(TAG, "cmd" + testItem.getCmd());
+        testItem.popCmd();
+        Log.d(TAG, "cmd:" + testItem.getCmd());
+        Log.d(TAG, "func----------------------E");
+        return 0;
+    }
+    public int AIR_BD_TxPowerWrite(BLE_testItem testItem)
+    {
+        Log.d(TAG, "\nfunc----------------------S");
+        Log.d(TAG, "gettestName:" + testItem.gettestName());
+        Log.d(TAG, "data:" + testItem.getdataStr());
+        Log.d(TAG, "cmd" + testItem.getCmd());
+        testItem.popCmd();
+        Log.d(TAG, "cmd:" + testItem.getCmd());
+        Log.d(TAG, "func----------------------E");
+        return 0;
+    }
+    public int AIR_BD_BatteryLevelWrite(BLE_testItem testItem)
+    {
+        Log.d(TAG, "\nfunc----------------------S");
+        Log.d(TAG, "gettestName:" + testItem.gettestName());
+        Log.d(TAG, "data:" + testItem.getdataStr());
+        Log.d(TAG, "cmd" + testItem.getCmd());
+        testItem.popCmd();
+        Log.d(TAG, "cmd:" + testItem.getCmd());
+        Log.d(TAG, "func----------------------E");
+        return 0;
+    }
+    public int AIR_BD_IntvLatencyWrite(BLE_testItem testItem)
+    {
+        Log.d(TAG, "\nfunc----------------------S");
+        Log.d(TAG, "gettestName:" + testItem.gettestName());
+        Log.d(TAG, "data:" + testItem.getdataStr());
+        Log.d(TAG, "cmd" + testItem.getCmd());
+        testItem.popCmd();
+        Log.d(TAG, "cmd:" + testItem.getCmd());
+        Log.d(TAG, "func----------------------E");
+        return 0;
+    }
+    public int AIR_BD_AdvDataWrite2(BLE_testItem testItem)
+    {
+        Log.d(TAG, "\nfunc----------------------S");
+        Log.d(TAG, "gettestName:" + testItem.gettestName());
+        Log.d(TAG, "data:" + testItem.getdataStr());
+        Log.d(TAG, "cmd" + testItem.getCmd());
+        testItem.popCmd();
+        Log.d(TAG, "cmd:" + testItem.getCmd());
+        Log.d(TAG, "func----------------------E");
+        return 0;
+    }
+    public int AIR_BD_ScanResDataWrite(BLE_testItem testItem)
+    {
+        Log.d(TAG, "\nfunc----------------------S");
+        Log.d(TAG, "gettestName:" + testItem.gettestName());
+        Log.d(TAG, "data:" + testItem.getdataStr());
+        Log.d(TAG, "cmd" + testItem.getCmd());
+        testItem.popCmd();
+        Log.d(TAG, "cmd:" + testItem.getCmd());
+        Log.d(TAG, "func----------------------E");
+        return 0;
+    }
+    public int AIR_BD_DisconnectWrite(BLE_testItem testItem)
+    {
+        Log.d(TAG, "\nfunc----------------------S");
+        Log.d(TAG, "gettestName:" + testItem.gettestName());
+        Log.d(TAG, "data:" + testItem.getdataStr());
+        Log.d(TAG, "cmd" + testItem.getCmd());
+        testItem.popCmd();
+        Log.d(TAG, "cmd:" + testItem.getCmd());
+        Log.d(TAG, "func----------------------E");
+        return 0;
+    }
+    public int AIR_BD_DataPayloadWrite(BLE_testItem testItem)
+    {
+        Log.d(TAG, "\nfunc----------------------S");
+        Log.d(TAG, "gettestName:" + testItem.gettestName());
+        Log.d(TAG, "data:" + testItem.getdataStr());
+        Log.d(TAG, "cmd" + testItem.getCmd());
+        testItem.popCmd();
+        Log.d(TAG, "cmd:" + testItem.getCmd());
+        Log.d(TAG, "func----------------------E");
+        return 0;
+    }
+    public int AIR_BD_phy(BLE_testItem testItem)
     {
         Log.d(TAG, "\nfunc----------------------S");
         Log.d(TAG, "gettestName:" + testItem.gettestName());

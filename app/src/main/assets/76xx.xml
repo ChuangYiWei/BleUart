@@ -292,19 +292,631 @@
             <cmd>560194042000:57010000940420000400B0A0</cmd>
         </item>
     </UART>
-
+<!--===================================================-->
     <SPI>
+        <!--3, 11++++++++++++++++++++BDAddrWriteCmd BD_Addr(6 bytes, public, LSB)-->
+        <!--write 6 byte addr 設定成default addr-->
+        <item>
+            <func_name>BD_AddrWrite</func_name>
+            <data>01:23:45:67:89:0A</data>
+            <cmd>A92533060A8967452301:63263300</cmd>
+            <cmd>A22033:692133060A8967452301</cmd>
+        </item>
+        <!--write 6 byte addr-->
+        <item>
+            <func_name>BD_AddrWrite</func_name>
+            <data>11:22:33:44:55:66</data>
+            <cmd>A9253306665544332211:63263300</cmd>
+            <cmd>A22033:69213306665544332211</cmd>
+        </item>
+        <!--[write 5 byte less than 6 byte] LSB會是上一次addr的-->
+        <item>
+            <func_name>BD_AddrWrite</func_name>
+            <data>11:EE:DD:CC:BB:AA</data>
+            <cmd>A8253305AABBCCDDEE:63263300</cmd>
+            <cmd>A22033:69213306AABBCCDDEE11</cmd>
+        </item>
+        <!--[write 7 byte over than 6 byte] 只會抓到前六byte-->
+        <item>
+            <func_name>BD_AddrWrite</func_name>
+            <data>22:33:44:55:66:77</data>
+            <cmd>AA25330777665544332211:63263300</cmd>
+            <cmd>A22033:69213306776655443322</cmd>
+        </item>
+        <!--write 6 byte addr 設定成default addr-->
+        <item>
+            <func_name>BD_AddrWrite</func_name>
+            <data>01:23:45:67:89:0A</data>
+            <cmd>A92533060A8967452301:63263300</cmd>
+            <cmd>A22033:692133060A8967452301</cmd>
+        </item>
+
+        <!--++++++++++++++++++++AdvIntvWriteCmd
+    Adv Interval (Unit: 1 ms, Valid Range=20~10000,LSB) , data 0 means pass-->
+        <!--1000ms-->
         <item>
             <func_name>BD_IntvWrite</func_name>
             <data>1000</data>
             <cmd>A7253504E8030000:63263500</cmd>
             <cmd>A22035:67213504E8030000</cmd>
         </item>
+        <!--100ms-->
         <item>
             <func_name>BD_IntvWrite</func_name>
-            <data>100</data>
-            <cmd>B7253504E8030000:63263500</cmd>
-            <cmd>B22035:67213504E8030000</cmd>
+            <data>0</data>
+            <cmd>A725350464000000:63263500</cmd>
+            <cmd>A22035:6721350464000000</cmd>
+        </item>
+        <!--len 5 byte bigger than 4 byte 回default 100ms-->
+        <item>
+            <func_name>BD_IntvWrite</func_name>
+            <data>0</data>
+            <cmd>A82535056400000000:63263500</cmd>
+            <cmd>A22035:6721350464000000</cmd>
+        </item>
+        <!--len 3 byte less than 4 byte 回default 100ms-->
+        <item>
+            <func_name>BD_IntvWrite</func_name>
+            <data>0</data>
+            <cmd>A6253503640000:63263500</cmd>
+            <cmd>A22035:6721350464000000</cmd>
+        </item>
+
+        <!--5++++++++++++++++++++BDNameWriteCmd Length (up to 16 bytes)-->
+        <!--write 3 byte 123-->
+        <item>
+            <func_name>BD_NameWrite</func_name>
+            <data>123</data>
+            <cmd>A6253103313233:63263100</cmd>
+            <cmd>A22031:66213103313233</cmd>
+        </item>
+        <!--write 16 byte max 123456789@ABCDEF-->
+        <item>
+            <func_name>BD_NameWrite</func_name>
+            <data>123456789@ABCDEF</data>
+            <cmd>B325311031323334353637383940414243444546:63263100</cmd>
+            <cmd>A22031:7321311031323334353637383940414243444546</cmd>
+        </item>
+        <!--write 17 byte over 16(max) 123456789@ABCDEF 只寫16byte-->
+        <item>
+            <func_name>BD_NameWrite</func_name>
+            <data>123456789@ABCDEF</data>
+            <cmd>B42531113132333435363738394041424344454647:63263100</cmd>
+            <cmd>A22031:7321311031323334353637383940414243444546</cmd>
+        </item>
+        <!--write 0 byte 名字不會改 同上一個-->
+        <item>
+            <func_name>BD_NameWrite</func_name>
+            <data>123456789@ABCDEF</data>
+            <cmd>A3253100:63263100</cmd>
+            <cmd>A22031:63213100</cmd>
+        </item>
+        <!--write 1 byte-->
+        <item>
+            <func_name>BD_NameWrite</func_name>
+            <data>1</data>
+            <cmd>A425310131:63263100</cmd>
+            <cmd>A22031:6421310131</cmd>
+        </item>
+        <!--3, 11++++++++++++++++++++BDAddrWriteCmd BD_Addr(6 bytes, public, LSB)-->
+        <!--write 6 byte addr 設定成default addr-->
+        <item>
+            <func_name>BD_AddrWrite</func_name>
+            <data>01:23:45:67:89:0A</data>
+            <cmd>A92533060A8967452301:63263300</cmd>
+            <cmd>A22033:692133060A8967452301</cmd>
+        </item>
+        <!--write 6 byte addr-->
+        <item>
+            <func_name>BD_AddrWrite</func_name>
+            <data>11:22:33:44:55:66</data>
+            <cmd>A9253306665544332211:63263300</cmd>
+            <cmd>A22033:69213306665544332211</cmd>
+        </item>
+        <!--[write 5 byte less than 6 byte] LSB會是上一次addr的-->
+        <item>
+            <func_name>BD_AddrWrite</func_name>
+            <data>11:EE:DD:CC:BB:AA</data>
+            <cmd>A8253305AABBCCDDEE:63263300</cmd>
+            <cmd>A22033:69213306AABBCCDDEE11</cmd>
+        </item>
+        <!--[write 7 byte over than 6 byte] 只會抓到前六byte-->
+        <item>
+            <func_name>BD_AddrWrite</func_name>
+            <data>22:33:44:55:66:77</data>
+            <cmd>AA25330777665544332211:63263300</cmd>
+            <cmd>A22033:69213306776655443322</cmd>
+        </item>
+        <!--write 6 byte addr 設定成default addr-->
+        <item>
+            <func_name>BD_AddrWrite</func_name>
+            <data>01:23:45:67:89:0A</data>
+            <cmd>A92533060A8967452301:63263300</cmd>
+            <cmd>A22033:692133060A8967452301</cmd>
+        </item>
+
+        <!--4++++++++++++++++++++AdvDataWriteCmd Length (up to 25 bytes), “Manufacturer Specific Data-->
+        <!--[write 20 byte]-->
+        <item>
+            <func_name>BD_AdvDataWrite</func_name>
+            <data>020105030312180319C10308095E5F6061626364</data>
+            <cmd>B7253614020105030312180319C10308095E5F6061626364:63263600</cmd>
+            <cmd>A22036:77213614020105030312180319C10308095E5F6061626364</cmd>
+        </item>
+        <!--[write 3 byte]-->
+        <item>
+            <func_name>BD_AdvDataWrite</func_name>
+            <data>010203</data>
+            <cmd>A6253603010203:63263600</cmd>
+            <cmd>A22036:66213603010203</cmd>
+        </item>
+        <!--[write 26 byte over 25(max) byte] 只寫25 byte-->
+        <item>
+            <func_name>BD_AdvDataWrite</func_name>
+            <data>0201040303E0FF0BFFFFFF0000CE553AEDD0CC050961626306</data>
+            <cmd>BD25361A0201040303E0FF0BFFFFFF0000CE553AEDD0CC05096162630607:63263600</cmd>
+            <cmd>A22036:7C2136190201040303E0FF0BFFFFFF0000CE553AEDD0CC050961626306</cmd>
+        </item>
+
+
+        <!--4++++++++++++++++++++WhiteListWriteCmd Connectable device address – white list(6 bytes, LSB)-->
+        <!--0:means all devices can connect-->
+
+        <!--[write samsung] -->
+        <item>
+            <func_name>BD_WhiteListWrite</func_name>
+            <data>samsung</data>
+            <cmd>A9253706A21308CF31D8:63263700</cmd>
+            <cmd>A22037:69213706A21308CF31D8</cmd>
+        </item>
+
+        <!--[write 0] all pass-->
+        <item>
+            <func_name>BD_WhiteListWrite</func_name>
+            <data>ALLPASS</data>
+            <cmd>A9253706000000000000:63263700</cmd>
+            <cmd>A22037:69213706000000000000</cmd>
+        </item>
+
+        <!--++++++++++++++++++++TxPowerWriteCmd TxPwr (1 byte)0: 3dBm 1: 0dBm Others: Reserved-->
+        <!--fixed len: 1 byte-->
+        <!--[write val 2(-6db) and 0(3dbm)]-->
+        <item>
+            <func_name>BD_TxPowerWrite</func_name>
+            <data>-6:3</data>
+            <cmd>A425380102:63263800</cmd>
+            <cmd>A22038:6421380102</cmd>
+            <cmd>A425380100:63263800</cmd>
+            <cmd>A22038:6421380100</cmd>
+        </item>
+        <!--[write val 1(0dbm) and 0(3dbm)]-->
+        <!--<item>-->
+        <!--<func_name>BD_TxPowerWrite</func_name>-->
+        <!--<data>0:3</data>-->
+        <!--<cmd>A425380101:63263800</cmd>-->
+        <!--<cmd>A22038:6421380101</cmd>-->
+        <!--<cmd>A425380100:63263800</cmd>-->
+        <!--<cmd>A22038:6421380100</cmd>-->
+        <!--</item>-->
+
+        <!--++++++++++++++++++++BatteryLevelWriteCmd -->
+        <item>
+            <func_name>BD_BatteryLevelWrite</func_name>
+            <data>10</data>
+            <cmd>A4253B0110:63263B00</cmd>
+            <!--<cmd>A4253B0130:63263B00</cmd>-->
+        </item>
+
+        <item>
+            <func_name>BD_BatteryLevelWrite</func_name>
+            <data>30</data>
+            <cmd>A4253B0130:63263B00</cmd>
+        </item>
+
+        <!--++++++++++++++++++++IntvLatencyWrite2Cmd -->
+        <!--read : 0x213004 + Connection Interval (4 bytes, Unit: 1ms, Valid Range=8~4000, LSB)-->
+        <!--沒連線時tx event只會收到63263015(fail)-->
+        <!--沒連線時rx event只會6721300400000000(val為0)-->
+        <!--write: 0x25 0x40 0x08(fixed length) Only available when connected.-->
+        <!--[I=150~200ms.L=0]/[I=10~20ms.L=0]-->
+        <item>
+            <func_name>BD_IntvLatencyWrite</func_name>
+            <data>150ms:10ms</data>
+            <cmd>AB2540087800A00000005802:63263000</cmd>
+            <cmd>A22030:67213004C6000000</cmd>
+            <cmd>AB2540080800100000005802:63263000</cmd>
+            <cmd>A22030:6721300412000000</cmd>
+        </item>
+
+        <!--++++++++++++++++++++AdvDataWrite2Cmd -->
+        <!--(up to 31 bytes, whole Advertising Data field value, MSB)-->
+        <!--fixed len: 31 byte-->
+
+        <!--[write len=31 max]-->
+        <item>
+            <func_name>BD_AdvDataWrite2</func_name>
+            <data>0201060302F0FF179999999999999999999999999999999999999999999999</data>
+            <cmd>A025501F0201060302F0FF17999999999999999999999999999999999999999999+A29999:63265000</cmd>
+        </item>
+        <!--[write len=14]-->
+        <item>
+            <func_name>BD_AdvDataWrite2</func_name>
+            <data>0201060A99999999999999999999</data>
+            <cmd>B125500E0201060A99999999999999999999:63265000</cmd>
+        </item>
+        <!--[write len=12]-->
+        <item>
+            <func_name>BD_AdvDataWrite2</func_name>
+            <data>02010608FF31323334353637</data>
+            <cmd>AF25500C02010608FF31323334353637:63265000</cmd>
+        </item>
+
+        <!--++++++++++++++++++++ScanResDataWriteCmd -->
+        <!--(up to 31 bytes, whole Scan Response Data field value, MSB)-->
+        <!--[write len=8]-->
+        <item>
+            <func_name>BD_ScanResDataWrite</func_name>
+            <data>0201060409383838</data>
+            <cmd>AB2551080201060409383838:63265100</cmd>
+        </item>
+        <!--[write len=31]-->
+        <item>
+            <func_name>BD_ScanResDataWrite</func_name>
+            <data>0201060302F0FF07170102030405060F094441524B5F4B4E494748545F</data>
+            <cmd>A025511F0201060302F0FF07170102030405060F094441524B5F4B4E494748545F+A2474F:63265100</cmd>
+        </item>
+
+
+        <!--++++++++++++++++++++DisconnectWriteCmd -->
+        <!--[write len=0 OK] 沒連線會收到 63265F01,有連線則63265F00,然後會收到 event packet of 26FF10-->
+        <!--cmd應該收到斷線成功+斷線event-->
+        <item>
+            <func_name>BD_DisconnectWrite</func_name>
+            <data>1</data>
+            <cmd>A3255F00:63265F006326FF10</cmd>
+        </item>
+
+        <!--++++++++++++++++++++data payload WriteCmd -->
+        <!--5 byte-->
+        <item>
+            <func_name>BD_DataPayloadWrite</func_name>
+            <data>3031323334</data>
+            <cmd>A722053031323334:63262200</cmd>
+        </item>
+        <!--20 byte-->
+        <item>
+            <func_name>BD_DataPayloadWrite</func_name>
+            <data>4142434445464748494A4B4C4D4E4F5051525354</data>
+            <cmd>B622144142434445464748494A4B4C4D4E4F5051525354:63262200</cmd>
+        </item>
+        <!--50byte-->
+        <item>
+            <func_name>BD_DataPayloadWrite</func_name>
+            <data>6162636465666768696A6B6C6D6E6F707172737475767778797A7B7C7D7E7EB47F808182838485868788898A8B8C8D8E8F90</data>
+            <cmd>A022326162636465666768696A6B6C6D6E6F707172737475767778797A7B7C7D7E+B47EB47F808182838485868788898A8B8C8D8E8F90:63262200</cmd>
+        </item>
+
+        <!--++++++++++++++++++++phy -->
+        <!--[PHY_Read__0x00005FFC (ROM Version) ++++ R]-->
+        <item>
+            <func_name>BD_phy</func_name>
+            <data>1</data>
+            <cmd>A65601FC5F0000:6C57010000FC5F000000000099</cmd>
+        </item>
+        <!--[Disable EEPROM Check 0x0020_0134 +++++++ W]-->
+        <item>
+            <func_name>BD_phy</func_name>
+            <data>1</data>
+            <cmd>AC550100003401200001000000:FF</cmd><!--rx got nothing , gen FF to pass-->
+            <cmd>A6560134012000:6C570100003401200001000000</cmd>
+        </item>
+        <!--[Patch_B Version 0x0020_0484  +++++++ R]-->
+        <item>
+            <func_name>BD_phy</func_name>
+            <data>1</data>
+            <cmd>A6560184042000:6C570100008404200011905018</cmd>
+        </item>
+        <!--[Patch_A Version  0x0020_0490   +++++++ R]-->
+        <item>
+            <func_name>BD_phy</func_name>
+            <data>1</data>
+            <cmd>A6560190042000:6C570100009004200010105118</cmd>
+        </item>
+        <!--[Function  0x0020_0494  +++++++ RW]-->
+        <item>
+            <func_name>BD_phy</func_name>
+            <data>1</data>
+            <cmd>A6560194042000:6C57010000940420000400B0A0</cmd>
         </item>
     </SPI>
+
+    <AIR_CMD>
+        <!--3, 11++++++++++++++++++++BDAddrWriteCmd BD_Addr(6 bytes, public, LSB)-->
+        <!--write 6 byte addr 設定成default addr-->
+        <item>
+            <func_name>AIR_BD_AddrWrite</func_name>
+            <data>01:23:45:67:89:0A</data>
+            <cmd>2533060A8967452301:263300</cmd>
+            <cmd>2033:2133060A8967452301</cmd>
+        </item>
+        <!--write 6 byte addr-->
+        <item>
+            <func_name>AIR_BD_AddrWrite</func_name>
+            <data>11:22:33:44:55:66</data>
+            <cmd>253306665544332211:263300</cmd>
+            <cmd>2033:213306665544332211</cmd>
+        </item>
+        <!--[write 7 byte over than 6 byte] 只會抓到前六byte-->
+        <item>
+            <func_name>AIR_BD_AddrWrite</func_name>
+            <data>22:33:44:55:66:77</data>
+            <cmd>25330777665544332211:263300</cmd>
+            <cmd>2033:213306776655443322</cmd>
+        </item>
+        <!--write 6 byte addr 設定成default addr-->
+        <item>
+            <func_name>AIR_BD_AddrWrite</func_name>
+            <data>01:23:45:67:89:0A</data>
+            <cmd>2533060A8967452301:263300</cmd>
+            <cmd>2033:2133060A8967452301</cmd>
+        </item>
+
+        <!--++++++++++++++++++++AdvIntvWriteCmd
+    Adv Interval (Unit: 1 ms, Valid Range=20~10000,LSB) , data 0 means pass-->
+        <!--1000ms-->
+        <item>
+            <func_name>AIR_BD_IntvWrite</func_name>
+            <data>1000</data>
+            <cmd>253504E8030000:263500</cmd>
+            <cmd>2035:213504E8030000</cmd>
+        </item>
+        <!--100ms-->
+        <item>
+            <func_name>AIR_BD_IntvWrite</func_name>
+            <data>100</data>
+            <cmd>25350464000000:263500</cmd>
+            <cmd>2035:21350464000000</cmd>
+        </item>
+        <!--len 5 byte bigger than 4 byte 回default 100ms-->
+        <item>
+            <func_name>AIR_BD_IntvWrite</func_name>
+            <data>0</data>
+            <cmd>2535056400000000:263500</cmd>
+            <cmd>2035:21350464000000</cmd>
+        </item>
+        <!--len 3 byte less than 4 byte 回default 100ms-->
+        <item>
+            <func_name>AIR_BD_IntvWrite</func_name>
+            <data>0</data>
+            <cmd>253503640000:263500</cmd>
+            <cmd>2035:21350464000000</cmd>
+        </item>
+
+        <!--5++++++++++++++++++++AIR_BD_NameWriteCmd Length (up to 16 bytes)-->
+        <!--write 3 byte 123-->
+        <item>
+            <func_name>AIR_BD_NameWrite</func_name>
+            <data>123</data>
+            <cmd>253103313233:263100</cmd>
+            <cmd>2031:213103313233</cmd>
+        </item>
+        <!--write 16 byte max 123456789@ABCDEF-->
+        <item>
+            <func_name>AIR_BD_NameWrite</func_name>
+            <data>123456789@ABCDEF</data>
+            <cmd>25311031323334353637383940414243444546:263100</cmd>
+            <cmd>2031:21311031323334353637383940414243444546</cmd>
+        </item>
+        <!--write 17 byte over 16(max) 123456789@ABCDEF 只寫16byte-->
+        <item>
+            <func_name>AIR_BD_NameWrite</func_name>
+            <data>123456789@ABCDEF</data>
+            <cmd>2531113132333435363738394041424344454647:263100</cmd>
+            <cmd>2031:21311031323334353637383940414243444546</cmd>
+        </item>
+        <!--write 0 byte 名字不會改 同上一個-->
+        <item>
+            <func_name>AIR_BD_NameWrite</func_name>
+            <data>123456789@ABCDEF</data>
+            <cmd>253100:263100</cmd>
+            <cmd>2031:213100</cmd>
+        </item>
+        <!--write 1 byte-->
+        <item>
+            <func_name>AIR_BD_NameWrite</func_name>
+            <data>1</data>
+            <cmd>25310131:263100</cmd>
+            <cmd>2031:21310131</cmd>
+        </item>
+
+        <!--4++++++++++++++++++++AdvDataWriteCmd Length (up to 25 bytes), “Manufacturer Specific Data-->
+        <!--&lt;!&ndash;[write 20 byte]&ndash;&gt;-->
+        <!--<item>-->
+            <!--<func_name>AIR_BD_AdvDataWrite</func_name>-->
+            <!--<data>020105030312180319C10308095E5F6061626364</data>-->
+            <!--<cmd>253614020105030312180319C10308095E5F6061626364:263600</cmd>-->
+            <!--<cmd>2036:213614020105030312180319C10308095E5F6061626364</cmd>-->
+        <!--</item>-->
+        <!--[write 3 byte]-->
+        <item>
+            <func_name>AIR_BD_AdvDataWrite</func_name>
+            <data>010203</data>
+            <cmd>253603010203:263600</cmd>
+            <cmd>2036:213603010203</cmd>
+        </item>
+        <!--&lt;!&ndash;[write 26 byte over 25(max) byte] 只寫25 byte&ndash;&gt;-->
+        <!--<item>-->
+            <!--<func_name>AIR_BD_AdvDataWrite</func_name>-->
+            <!--<data>0201040303E0FF0BFFFFFF0000CE553AEDD0CC050961626306</data>-->
+            <!--<cmd>25361A0201040303E0FF0BFFFFFF0000CE553AEDD0CC05096162630607:263600</cmd>-->
+            <!--<cmd>2036:2136190201040303E0FF0BFFFFFF0000CE553AEDD0CC050961626306</cmd>-->
+        <!--</item>-->
+
+        <!--4++++++++++++++++++++WhiteListWriteCmd Connectable device address – white list(6 bytes, LSB)-->
+        <!--0:means all devices can connect-->
+
+        <!--&lt;!&ndash;[write samsung] &ndash;&gt;-->
+        <!--<item>-->
+            <!--<func_name>AIR_BD_WhiteListWrite</func_name>-->
+            <!--<data>samsung</data>-->
+            <!--<cmd>253706A21308CF31D8:263700</cmd>-->
+            <!--<cmd>2037:213706A21308CF31D8</cmd>-->
+        <!--</item>-->
+
+        <!--&lt;!&ndash;[write 0] all pass&ndash;&gt;-->
+        <!--<item>-->
+            <!--<func_name>AIR_BD_WhiteListWrite</func_name>-->
+            <!--<data>ALLPASS</data>-->
+            <!--<cmd>253706000000000000:263700</cmd>-->
+            <!--<cmd>2037:213706000000000000</cmd>-->
+        <!--</item>-->
+
+        <!--++++++++++++++++++++TxPowerWriteCmd TxPwr (1 byte)0: 3dBm 1: 0dBm Others: Reserved-->
+        <!--fixed len: 1 byte-->
+        <!--[write val 2(-6db) and 0(3dbm)]-->
+        <item>
+            <func_name>AIR_BD_TxPowerWrite</func_name>
+            <data>-6:3</data>
+            <cmd>25380102:263800</cmd>
+            <cmd>2038:21380102</cmd>
+            <cmd>25380100:263800</cmd>
+            <cmd>2038:21380100</cmd>
+        </item>
+        <!--[write val 1(0dbm) and 0(3dbm)]-->
+        <!--<item>-->
+        <!--<func_name>AIR_BD_TxPowerWrite</func_name>-->
+        <!--<data>0:3</data>-->
+        <!--<cmd>25380101:263800</cmd>-->
+        <!--<cmd>2038:21380101</cmd>-->
+        <!--<cmd>25380100:263800</cmd>-->
+        <!--<cmd>2038:21380100</cmd>-->
+        <!--</item>-->
+
+        <!--++++++++++++++++++++BatteryLevelWriteCmd -->
+        <item>
+            <func_name>AIR_BD_BatteryLevelWrite</func_name>
+            <data>10</data>
+            <cmd>253B0110:263B00</cmd>
+        </item>
+
+        <item>
+            <func_name>AIR_BD_BatteryLevelWrite</func_name>
+            <data>30</data>
+            <cmd>253B0130:263B00</cmd>
+        </item>
+
+        <!--++++++++++++++++++++IntvLatencyWrite2Cmd -->
+        <!--read : 0x213004 + Connection Interval (4 bytes, Unit: 1ms, Valid Range=8~4000, LSB)-->
+        <!--沒連線時tx event只會收到63263015(fail)-->
+        <!--沒連線時rx event只會6721300400000000(val為0)-->
+        <!--write: 0x25 0x40 0x08(fixed length) Only available when connected.-->
+        <!--[I=150~200ms.L=0]/[I=10~20ms.L=0]-->
+        <item>
+            <func_name>AIR_BD_IntvLatencyWrite</func_name>
+            <data>150</data>
+            <cmd>2540087800A00000005802:263000</cmd>
+            <cmd>2030:213004C6000000</cmd>
+        </item>
+        <item>
+            <func_name>AIR_BD_IntvLatencyWrite</func_name>
+            <data>10</data>
+            <cmd>2540080800100000005802:263000</cmd>
+            <cmd>2030:21300412000000</cmd>
+        </item>
+        <!--++++++++++++++++++++AdvDataWrite2Cmd -->
+        <!--(up to 31 bytes, whole Advertising Data field value, MSB)-->
+        <!--fixed len: 31 byte-->
+
+        <!--[write len=31 max]-->
+        <!--<item>-->
+            <!--<func_name>AIR_BD_AdvDataWrite2</func_name>-->
+            <!--<data>0201060302F0FF179999999999999999999999999999999999999999999999</data>-->
+            <!--<cmd>25501F0201060302F0FF17999999999999999999999999999999999999999999+9999:265000</cmd>-->
+        <!--</item>-->
+        <!--[write len=14]-->
+        <item>
+            <func_name>AIR_BD_AdvDataWrite2</func_name>
+            <data>0201060A99999999999999999999</data>
+            <cmd>25500E0201060A99999999999999999999:265000</cmd>
+        </item>
+        <!--[write len=12 max]-->
+        <item>
+            <func_name>AIR_BD_AdvDataWrite2</func_name>
+            <data>02010608FF31323334353637</data>
+            <cmd>25500C02010608FF31323334353637:265000</cmd>
+        </item>
+
+        <!--++++++++++++++++++++ScanResDataWriteCmd -->
+        <!--(up to 31 bytes, whole Scan Response Data field value, MSB)-->
+        <!--[write len=8]-->
+        <item>
+            <func_name>AIR_BD_ScanResDataWrite</func_name>
+            <data>0201060409383838</data>
+            <cmd>2551080201060409383838:265100</cmd>
+        </item>
+        <!--&lt;!&ndash;[write len=31]&ndash;&gt;-->
+        <!--<item>-->
+            <!--<func_name>AIR_BD_ScanResDataWrite</func_name>-->
+            <!--<data>0201060302F0FF07170102030405060F094441524B5F4B4E494748545F</data>-->
+            <!--<cmd>25511F0201060302F0FF07170102030405060F094441524B5F4B4E494748545F+474F:265100</cmd>-->
+        <!--</item>-->
+
+
+        <!--++++++++++++++++++++DisconnectWriteCmd -->
+        <!--[write len=0 OK] 沒連線會收到 63265F01,有連線則63265F00,然後會收到 event packet of 26FF10-->
+        <!--cmd應該收到斷線成功+斷線event-->
+        <item>
+            <func_name>AIR_BD_DisconnectWrite</func_name>
+            <data>1</data>
+            <cmd>255F00:265F0026FF10</cmd>
+        </item>
+
+        <!--++++++++++++++++++++data payload WriteCmd -->
+        <!--5 byte-->
+        <item>
+            <func_name>AIR_BD_DataPayloadWrite</func_name>
+            <data>3031323334</data>
+            <cmd>22053031323334:NA</cmd>
+        </item>
+        <!--18 byte-->
+        <item>
+            <func_name>BD_DataPayloadWrite</func_name>
+            <data>22124142434445464748494A4B4C4D4E4F505152</data>
+            <cmd>22124142434445464748494A4B4C4D4E4F505152:NA</cmd>
+        </item>
+
+
+        <!--++++++++++++++++++++phy -->
+        <!--[PHY_Read__0x00005FFC (ROM Version) ++++ R]-->
+        <item>
+            <func_name>AIR_BD_phy</func_name>
+            <data>1</data>
+            <cmd>5601FC5F0000:57010000FC5F000000000099</cmd>
+        </item>
+        <!--[Disable EEPROM Check 0x0020_0134 +++++++ W]-->
+        <item>
+            <func_name>AIR_BD_phy</func_name>
+            <data>1</data>
+            <cmd>550100003401200001000000:FF</cmd><!--rx got nothing , gen FF to pass-->
+            <cmd>560134012000:570100003401200001000000</cmd>
+        </item>
+        <!--[Patch_B Version 0x0020_0484  +++++++ R]-->
+        <item>
+            <func_name>AIR_BD_phy</func_name>
+            <data>1</data>
+            <cmd>560184042000:570100008404200011905018</cmd>
+        </item>
+        <!--[Patch_A Version  0x0020_0490   +++++++ R]-->
+        <item>
+            <func_name>AIR_BD_phy</func_name>
+            <data>1</data>
+            <cmd>560190042000:570100009004200010105118</cmd>
+        </item>
+        <!--[Function  0x0020_0494  +++++++ RW]-->
+        <item>
+            <func_name>AIR_BD_phy</func_name>
+            <data>1</data>
+            <cmd>560194042000:57010000940420000400B0A0</cmd>
+        </item>
+    </AIR_CMD>
 </BC76xx>

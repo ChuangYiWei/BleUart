@@ -176,7 +176,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    private String[] testModeArray = {"SPI mode","UART mode"};
+    private String[] testModeArray = {"SPI mode","UART mode", "AIR CMD mode"};
     int modeIdx = 0;
     public void setupSpinner(){
         Spinner spinner = (Spinner) findViewById(R.id.spinner);
@@ -669,9 +669,12 @@ public class MainActivity extends AppCompatActivity {
             String mode = "";
             if (0 == GetTestMode()) {
                 mode = "SPI";
-            } else {
+            } else if(1 == GetTestMode()){
                 mode = "UART";
+            }else {
+                mode = "AIR_CMD";
             }
+
             List<BLE_testItem> list = XmlParser.getTestItems(in_stream, mode);
             for (BLE_testItem item : list) {
                 if (!isThreadRunning()) {
