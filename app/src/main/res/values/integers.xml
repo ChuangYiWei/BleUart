@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--=====================================================================================================================================================================================-->
+    <!--java                                                                                                                                                                                 -->
+    <!--=====================================================================================================================================================================================-->
+    <!--................................dbg.java.............................................................................................................................................-->
+    <!--dbg
+            _ShowOnScreen_	        =0x01;
+            _SaveFile_		        =0x02;
+            _ShowDeltaTime_	        =0x04;
+            _KeepFile_	            =0x08;
+            _SingleFile_	        =0x10;
+            _ShowLog_	            =0x20;
+    -->
+    <integer name="UART_MODE">0x00</integer>
+    <integer name="SPI_MODE">0x01</integer>
+    <!--................................activity_main........................................................................................................................................-->
+    <integer name="activity_main_dbg">0x20</integer>
+    <!--................................activity_00..........................................................................................................................................-->
+    <integer name="DeviceScanActivity_dbg">0x00</integer>
+    <integer name="DeviceControlActivity_dbg">0x00</integer>
+    <!--................................activity_01..........................................................................................................................................-->
+    <integer name="leScan_dbg">0x00</integer>
+    <integer name="leScan_tickPeriod">10</integer>
+    <integer name="leScan_scanTimeout_s">60</integer>
+    <integer name="leControl_dbg">0x00</integer>
+    <integer name="leControl_tickPeriod">10</integer>
+    <integer name="leControl_tickCount">1000</integer>
+    <!--................................activity_02..........................................................................................................................................-->
+    <integer name="leRobotScan_dbg">0x00</integer>
+    <integer name="leRobotScan_tickPeriod">10</integer>
+    <integer name="leRobotScan_scanTimeout_s">60</integer>
+    <integer name="leRobotControl_dbg">0x00</integer>
+    <integer name="leRobotControl_tickPeriod">10</integer>
+    <integer name="leRobotControl_tickCount">100</integer>
+    <!--................................activity_04..........................................................................................................................................-->
+    <integer name="leScanActivity_dbg">0x00</integer>
+    <integer name="leControlActivity_dbg">0x00</integer>
+
+
+    <integer name="activity_uart_dbg">0x1A</integer>
+    <!--................................leAdv.java...........................................................................................................................................-->
+    <integer name="leAdv_dbg">0x0A</integer>
+    <integer name="leAdv_tickPeriod">10</integer>
+    <integer name="leAdv_tickCount">1000</integer>
+
+    <integer name="et_weigth">5</integer>
+    <!--................................BluetoothLeService.java..............................................................................................................................-->
+    <!--show toast,casue function fail-->
+    <integer name="BluetoothLeService_dbg">0x1A</integer>
+    <integer name="BluetoothLeAdvertiserService_dbg">0x1A</integer>
+
+    <integer name="BluetoothGattCallback_dbg">0x1A</integer>
+    <integer name="BluetoothGattServerCallback_dbg">0x1A</integer>
+    <!--show toast,casue function fail-->
+    <!--................................pGatt.java...........................................................................................................................................-->
+    <integer name="pGatt_dbg">0x20</integer>
+    <!--................................pDB.java.............................................................................................................................................-->
+    <integer name="pDB_dbg">0x00</integer>
+    <!--................................pFileOp.java.........................................................................................................................................-->
+    <integer name="pFileOp_dbg">0x00</integer>
+    <!--................................activity_setting.java................................................................................................................................-->
+    <integer name="activity_setting_dbg">0x1A</integer>
+    <!--................................my_menu_handler_dbg.java.............................................................................................................................-->
+    <integer name="my_menu_handler_dbg">0x00</integer>
+    <!--................................my_adapter.java......................................................................................................................................-->
+    <integer name="my_adapter_dbg">0x00</integer>
+    <!--................................TreeViewAdapter.java.................................................................................................................................-->
+    <integer name="TreeViewAdapter_dbg">0x00</integer>
+    <integer name="TreeViewItemClickListener_dbg">0x00</integer>
+    <!--................................Element.java.........................................................................................................................................-->
+    <integer name="Element_dbg">0x00</integer>
+    <!--................................ToggleButtonGroupTableLayout.java....................................................................................................................-->
+    <integer name="pDialogTableLayout_dbg">0x00</integer>
+    <!--...............................................................................-->
+    <integer name="TableLayout_Spinner_weight">4</integer>
+    <!--...............................................................................-->
+    <integer name="TableLayout_RadioButton_color_transparent">0x3FFFFFFF</integer>
+    <integer name="TableLayout_RadioButton_color_org">0xC0000000</integer>
+
+    <integer name="TableLayout_RadioButton_weight">4</integer>
+    <!--...............................................................................-->
+    <integer name="TableLayout_CheckBox_color_transparent">0x3FFFFFFF</integer>
+    <integer name="TableLayout_CheckBox_color_org">0xC0000000</integer>
+
+    <integer name="TableLayout_CheckBox_weigth">4</integer>
+    <!--...............................................................................-->
+    <integer name="TableLayout_TextView_color_transparent">0x3FFFFFFF</integer>
+    <integer name="TableLayout_TextView_color_org">0xC0000000</integer>
+
+    <integer name="TableLayout_TextView_weight">4</integer>
+    <!--...............................................................................-->
+    <integer name="TableLayout_EditText_color_transparent">0x3FFFFFFF</integer>
+    <integer name="TableLayout_EditText_color_org">0xC0000000</integer>
+
+    <integer name="TableLayout_EditText_weigth">5</integer>
+
+    <integer name="TableLayout_EditText_hint_color_transparent">0x1FFFFFFF</integer>
+    <integer name="TableLayout_EditText_hint_color_org">0xE0000000</integer>
+    <!--................................pUART.java...........................................................................................................................................-->
+    <integer name="pUART_dbg">0x1A</integer>
+
+    <!--................................PL2303Driver.java...........................................................................................................................................-->
+    <integer name="PL2303Driver_dbg">0x1A</integer>
+    <!--=====================================================================================================================================================================================-->
+    <!--xml                                                                                                                                                                                  -->
+    <!--=====================================================================================================================================================================================-->
+    <!--................................dialog_ble_property1.xml.............................................................................................................................-->
+    <integer name="TableLayout_RadioButton_weight_1">1</integer>
+    <integer name="TableLayout_EditText_weigth_1">3</integer>
+
+    <!--=====================================================================================================================================================================================-->
+    <!--others                                                                                                                                                                               -->
+    <!--=====================================================================================================================================================================================-->
+
+    <!--expire unit:day-->
+    <integer name="expire">365</integer>
+    <!--...............................................................................-->
+    <integer name="indentionBase">30</integer>
+    <!--unint: ms......................................................................-->
+    <integer name="screenOffDelay">10000</integer>
+
+    <!--=====================================================================================================================================================================================-->
+
+</resources>

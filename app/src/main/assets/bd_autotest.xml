@@ -1,0 +1,316 @@
+<?xml version="1.0" encoding="utf-8"?>
+<BD_AutoTests>
+    <!--++++++++++++++++++++AdvIntvWriteCmd
+    Adv Interval (Unit: 1 ms, Valid Range=20~10000,LSB) , data 0 means pass-->
+    <!--value 5000 ms-->
+    <!--<BD_Autotest>-->
+        <!--<testName>BD_TEST_INTV_WRITE</testName>-->
+        <!--<data>5000</data>-->
+        <!--<cmd>A725350488130000:63263500</cmd>-->
+        <!--<cmd>A22035:6721350488130000</cmd>-->
+    <!--</BD_Autotest>-->
+    <!--1000ms-->
+    <BD_Autotest>
+        <testName>BD_TEST_INTV_WRITE</testName>
+        <data>1000</data>
+        <cmd>A7253504E8030000:63263500</cmd>
+        <cmd>A22035:67213504E8030000</cmd>
+    </BD_Autotest>
+   <!--100ms-->
+    <BD_Autotest>
+        <testName>BD_TEST_INTV_WRITE</testName>
+        <data>0</data>
+        <cmd>A725350464000000:63263500</cmd>
+        <cmd>A22035:6721350464000000</cmd>
+    </BD_Autotest>
+    <!--len 5 byte bigger than 4 byte 回default 100ms-->
+    <BD_Autotest>
+        <testName>BD_TEST_INTV_WRITE</testName>
+        <data>0</data>
+        <cmd>A82535056400000000:63263500</cmd>
+        <cmd>A22035:6721350464000000</cmd>
+    </BD_Autotest>
+    <!--len 3 byte less than 4 byte 回default 100ms-->
+    <BD_Autotest>
+        <testName>BD_TEST_INTV_WRITE</testName>
+        <data>0</data>
+        <cmd>A6253503640000:63263500</cmd>
+        <cmd>A22035:6721350464000000</cmd>
+    </BD_Autotest>
+
+    <!--5++++++++++++++++++++BDNameWriteCmd Length (up to 16 bytes)-->
+    <!--write 3 byte 123-->
+    <BD_Autotest>
+        <testName>BD_TEST_NAME_WRITE</testName>
+        <data>123</data>
+        <cmd>A6253103313233:63263100</cmd>
+        <cmd>A22031:66213103313233</cmd>
+    </BD_Autotest>
+    <!--write 16 byte max 123456789@ABCDEF-->
+    <BD_Autotest>
+        <testName>BD_TEST_NAME_WRITE</testName>
+        <data>123456789@ABCDEF</data>
+        <cmd>B325311031323334353637383940414243444546:63263100</cmd>
+        <cmd>A22031:7321311031323334353637383940414243444546</cmd>
+    </BD_Autotest>
+    <!--write 17 byte over 16(max) 123456789@ABCDEF 只寫16byte-->
+    <BD_Autotest>
+        <testName>BD_TEST_NAME_WRITE</testName>
+        <data>123456789@ABCDEF</data>
+        <cmd>B42531113132333435363738394041424344454647:63263100</cmd>
+        <cmd>A22031:7321311031323334353637383940414243444546</cmd>
+    </BD_Autotest>
+    <!--write 0 byte 名字不會改 同上一個-->
+    <BD_Autotest>
+        <testName>BD_TEST_NAME_WRITE</testName>
+        <data>123456789@ABCDEF</data>
+        <cmd>A3253100:63263100</cmd>
+        <cmd>A22031:63213100</cmd>
+    </BD_Autotest>
+    <!--write 1 byte-->
+    <BD_Autotest>
+        <testName>BD_TEST_NAME_WRITE</testName>
+        <data>1</data>
+        <cmd>A425310131:63263100</cmd>
+        <cmd>A22031:6421310131</cmd>
+    </BD_Autotest>
+
+    <!--3, 11++++++++++++++++++++BDAddrWriteCmd BD_Addr(6 bytes, public, LSB)-->
+    <!--write 6 byte addr 設定成default addr-->
+    <BD_Autotest>
+        <testName>BD_TEST_ADDR_WRITE</testName>
+        <data>01:23:45:67:89:0A</data>
+        <cmd>A92533060A8967452301:63263300</cmd>
+        <cmd>A22033:692133060A8967452301</cmd>
+    </BD_Autotest>
+    <!--write 6 byte addr-->
+    <BD_Autotest>
+        <testName>BD_TEST_ADDR_WRITE</testName>
+        <data>11:22:33:44:55:66</data>
+        <cmd>A9253306665544332211:63263300</cmd>
+        <cmd>A22033:69213306665544332211</cmd>
+    </BD_Autotest>
+    <!--[write 5 byte less than 6 byte] LSB會是上一次addr的-->
+    <BD_Autotest>
+        <testName>BD_TEST_ADDR_WRITE</testName>
+        <data>11:EE:DD:CC:BB:AA</data>
+        <cmd>A8253305AABBCCDDEE:63263300</cmd>
+        <cmd>A22033:69213306AABBCCDDEE11</cmd>
+    </BD_Autotest>
+    <!--[write 7 byte over than 6 byte] 只會抓到前六byte-->
+    <BD_Autotest>
+        <testName>BD_TEST_ADDR_WRITE</testName>
+        <data>22:33:44:55:66:77</data>
+        <cmd>AA25330777665544332211:63263300</cmd>
+        <cmd>A22033:69213306776655443322</cmd>
+    </BD_Autotest>
+    <!--write 6 byte addr 設定成default addr-->
+    <BD_Autotest>
+        <testName>BD_TEST_ADDR_WRITE</testName>
+        <data>01:23:45:67:89:0A</data>
+        <cmd>A92533060A8967452301:63263300</cmd>
+        <cmd>A22033:692133060A8967452301</cmd>
+    </BD_Autotest>
+
+    <!--4++++++++++++++++++++AdvDataWriteCmd Length (up to 25 bytes), “Manufacturer Specific Data-->
+    <!--[write 20 byte]-->
+    <BD_Autotest>
+        <testName>BD_TEST_ADVDATA_WRITE</testName>
+        <data>020105030312180319C10308095E5F6061626364</data>
+        <cmd>B7253614020105030312180319C10308095E5F6061626364:63263600</cmd>
+        <cmd>A22036:77213614020105030312180319C10308095E5F6061626364</cmd>
+    </BD_Autotest>
+    <!--[write 3 byte]-->
+    <BD_Autotest>
+        <testName>BD_TEST_ADVDATA_WRITE</testName>
+        <data>010203</data>
+        <cmd>A6253603010203:63263600</cmd>
+        <cmd>A22036:66213603010203</cmd>
+    </BD_Autotest>
+    <!--[write 26 byte over 25(max) byte] 只寫25 byte-->
+    <BD_Autotest>
+        <testName>BD_TEST_ADVDATA_WRITE</testName>
+        <data>0201040303E0FF0BFFFFFF0000CE553AEDD0CC050961626306</data>
+        <cmd>BD25361A0201040303E0FF0BFFFFFF0000CE553AEDD0CC05096162630607:63263600</cmd>
+        <cmd>A22036:7C2136190201040303E0FF0BFFFFFF0000CE553AEDD0CC050961626306</cmd>
+    </BD_Autotest>
+
+
+    <!--4++++++++++++++++++++WhiteListWriteCmd Connectable device address – white list(6 bytes, LSB)-->
+    <!--0:means all devices can connect-->
+
+    <!--[write samsung] -->
+    <BD_Autotest>
+        <testName>BD_TEST_WHITELIST_WRITE</testName>
+        <data>samsung</data>
+        <cmd>A9253706A21308CF31D8:63263700</cmd>
+        <cmd>A22037:69213706A21308CF31D8</cmd>
+    </BD_Autotest>
+
+    <!--[write 0] all pass-->
+    <BD_Autotest>
+        <testName>BD_TEST_WHITELIST_WRITE</testName>
+        <data>ALLPASS</data>
+        <cmd>A9253706000000000000:63263700</cmd>
+        <cmd>A22037:69213706000000000000</cmd>
+    </BD_Autotest>
+
+    <!--++++++++++++++++++++TxPowerWriteCmd TxPwr (1 byte)0: 3dBm 1: 0dBm Others: Reserved-->
+    <!--fixed len: 1 byte-->
+    <!--[write val 2(-6db) and 0(3dbm)]-->
+    <BD_Autotest>
+        <testName>BD_TEST_TXPOWER_WRITE</testName>
+        <data>-6:3</data>
+        <cmd>A425380102:63263800</cmd>
+        <cmd>A22038:6421380102</cmd>
+        <cmd>A425380100:63263800</cmd>
+        <cmd>A22038:6421380100</cmd>
+    </BD_Autotest>
+    <!--[write val 1(0dbm) and 0(3dbm)]-->
+    <!--<BD_Autotest>-->
+        <!--<testName>BD_TEST_TXPOWER_WRITE</testName>-->
+        <!--<data>0:3</data>-->
+        <!--<cmd>A425380101:63263800</cmd>-->
+        <!--<cmd>A22038:6421380101</cmd>-->
+        <!--<cmd>A425380100:63263800</cmd>-->
+        <!--<cmd>A22038:6421380100</cmd>-->
+    <!--</BD_Autotest>-->
+
+    <!--++++++++++++++++++++BatteryLevelWriteCmd -->
+    <BD_Autotest>
+        <testName>BD_TEST_BATTERYLEVEL_WRITE</testName>
+        <data>10</data>
+        <cmd>A4253B0110:63263B00</cmd>
+        <!--<cmd>A4253B0130:63263B00</cmd>-->
+    </BD_Autotest>
+
+    <BD_Autotest>
+        <testName>BD_TEST_BATTERYLEVEL_WRITE</testName>
+        <data>30</data>
+        <cmd>A4253B0130:63263B00</cmd>
+    </BD_Autotest>
+
+    <!--++++++++++++++++++++IntvLatencyWrite2Cmd -->
+    <!--read : 0x213004 + Connection Interval (4 bytes, Unit: 1ms, Valid Range=8~4000, LSB)-->
+    <!--沒連線時tx event只會收到63263015(fail)-->
+    <!--沒連線時rx event只會6721300400000000(val為0)-->
+    <!--write: 0x25 0x40 0x08(fixed length) Only available when connected.-->
+    <!--[I=150~200ms.L=0]/[I=10~20ms.L=0]-->
+    <BD_Autotest>
+        <testName>BD_TEST_INTVLATENCY_WRITE</testName>
+        <data>150ms:10ms</data>
+        <cmd>AB2540087800A00000005802:63263000</cmd>
+        <cmd>A22030:67213004C6000000</cmd>
+        <cmd>AB2540080800100000005802:63263000</cmd>
+        <cmd>A22030:6721300412000000</cmd>
+    </BD_Autotest>
+
+    <!--++++++++++++++++++++AdvDataWrite2Cmd -->
+    <!--(up to 31 bytes, whole Advertising Data field value, MSB)-->
+    <!--fixed len: 31 byte-->
+
+    <!--[write len=31 max]-->
+    <BD_Autotest>
+        <testName>BD_TEST_ADVDATA2_WRITE</testName>
+        <data>0201060302F0FF179999999999999999999999999999999999999999999999</data>
+        <cmd>A025501F0201060302F0FF17999999999999999999999999999999999999999999+A29999:63265000</cmd>
+    </BD_Autotest>
+    <!--[write len=14]-->
+    <BD_Autotest>
+        <testName>BD_TEST_ADVDATA2_WRITE</testName>
+        <data>0201060A99999999999999999999</data>
+        <cmd>B125500E0201060A99999999999999999999:63265000</cmd>
+    </BD_Autotest>
+    <!--[write len=12]-->
+    <BD_Autotest>
+        <testName>BD_TEST_ADVDATA2_WRITE</testName>
+        <data>02010608FF31323334353637</data>
+        <cmd>AF25500C02010608FF31323334353637:63265000</cmd>
+    </BD_Autotest>
+
+    <!--++++++++++++++++++++ScanResDataWriteCmd -->
+    <!--(up to 31 bytes, whole Scan Response Data field value, MSB)-->
+    <!--[write len=8]-->
+    <BD_Autotest>
+        <testName>BD_TEST_SCANRESDATA_WRITE</testName>
+        <data>0201060409383838</data>
+        <cmd>AB2551080201060409383838:63265100</cmd>
+    </BD_Autotest>
+    <!--[write len=31]-->
+    <BD_Autotest>
+        <testName>BD_TEST_SCANRESDATA_WRITE</testName>
+        <data>0201060302F0FF07170102030405060F094441524B5F4B4E494748545F</data>
+        <cmd>A025511F0201060302F0FF07170102030405060F094441524B5F4B4E494748545F+A2474F:63265100</cmd>
+    </BD_Autotest>
+
+
+    <!--++++++++++++++++++++DisconnectWriteCmd -->
+    <!--[write len=0 OK] 沒連線會收到 63265F01,有連線則63265F00,然後會收到 event packet of 26FF10-->
+    <!--cmd應該收到斷線成功+斷線event-->
+    <BD_Autotest>
+        <testName>BD_TEST_DISCONN_WRITE</testName>
+        <data>1</data>
+        <cmd>A3255F00:63265F006326FF10</cmd>
+    </BD_Autotest>
+
+    <!--++++++++++++++++++++data payload WriteCmd -->
+    <!--5 byte-->
+    <BD_Autotest>
+        <testName>BD_TEST_DATA_PAYLOAD_WRITE</testName>
+        <data>3031323334</data>
+        <cmd>A722053031323334:63262200</cmd>
+    </BD_Autotest>
+    <!--20 byte-->
+    <BD_Autotest>
+        <testName>BD_TEST_DATA_PAYLOAD_WRITE</testName>
+        <data>4142434445464748494A4B4C4D4E4F5051525354</data>
+        <cmd>B622144142434445464748494A4B4C4D4E4F5051525354:63262200</cmd>
+    </BD_Autotest>
+    <!--50byte-->
+    <BD_Autotest>
+        <testName>BD_TEST_DATA_PAYLOAD_WRITE</testName>
+        <data>6162636465666768696A6B6C6D6E6F707172737475767778797A7B7C7D7E7EB47F808182838485868788898A8B8C8D8E8F90</data>
+        <cmd>A022326162636465666768696A6B6C6D6E6F707172737475767778797A7B7C7D7E+B47EB47F808182838485868788898A8B8C8D8E8F90:63262200</cmd>
+    </BD_Autotest>
+
+    <!--++++++++++++++++++++phy -->
+    <!--[PHY_Read__0x00005FFC (ROM Version) ++++ R]-->
+    <BD_Autotest>
+        <testName>BD_TEST_PHY</testName>
+        <data>1</data>
+        <cmd>A65601FC5F0000:6C57010000FC5F000000000099</cmd>
+    </BD_Autotest>
+    <!--[Disable EEPROM Check 0x0020_0134 +++++++ W]-->
+    <BD_Autotest>
+        <testName>BD_TEST_PHY</testName>
+        <data>1</data>
+        <cmd>AC550100003401200001000000:FF</cmd><!--rx got nothing , gen FF to pass-->
+        <cmd>A6560134012000:6C570100003401200001000000</cmd>
+    </BD_Autotest>
+    <!--[Patch_B Version 0x0020_0484  +++++++ R]-->
+    <BD_Autotest>
+        <testName>BD_TEST_PHY</testName>
+        <data>1</data>
+        <cmd>A6560184042000:6C570100008404200011905018</cmd>
+    </BD_Autotest>
+    <!--[Patch_A Version  0x0020_0490   +++++++ R]-->
+    <BD_Autotest>
+        <testName>BD_TEST_PHY</testName>
+        <data>1</data>
+        <cmd>A6560190042000:6C570100009004200010105118</cmd>
+    </BD_Autotest>
+    <!--[Function  0x0020_0494  +++++++ RW]-->
+    <BD_Autotest>
+        <testName>BD_TEST_PHY</testName>
+        <data>1</data>
+        <cmd>A6560194042000:6C57010000940420000400B0A0</cmd>
+    </BD_Autotest>
+
+
+    <!--++++++++++++++++++++change baud rate, use name only -->
+    <BD_Autotest>
+        <testName>BD_TEST_CHANGE_BAUDRATE</testName>
+        <data>1</data>
+        <cmd>NA</cmd>
+    </BD_Autotest>
+</BD_AutoTests>
