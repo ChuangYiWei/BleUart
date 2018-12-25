@@ -135,7 +135,6 @@ public class XmlParser {
     private static BLE_testItem addItem(BLE_testItem obj_ble_testitem, XmlPullParser parser) throws IOException, XmlPullParserException {
         if (parser.getName().equals(ITEM)) {
             Log.d("item", "meet item new obj");
-            Log.d("item enable", parser.getAttributeValue(null, "enable"));
             obj_ble_testitem = new BLE_testItem();
         } else if (parser.getName().equals(FUNC_NAME)) {
             obj_ble_testitem.settestName(parser.nextText());
