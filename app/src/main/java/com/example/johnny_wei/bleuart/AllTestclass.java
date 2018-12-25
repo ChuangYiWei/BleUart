@@ -3,6 +3,7 @@ package com.example.johnny_wei.bleuart;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.Context;
+import android.os.Build;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.SystemClock;
@@ -3573,12 +3574,15 @@ public class AllTestclass extends AppCompatActivity {
         //todo:use tag name
         //Current_TEST_NAME = BD_TEST_DISCONN_WRITE;
 
-        commonutil.wdbgLogcat(TAG, 0, "S AIR========================" + testItem.gettestName());
-        write2MainUI("S AIR========================" + testItem.gettestName());
+        write2_MainUI_Log(0,"S=====" + testItem.gettestName());
+
+        write2_MainUI_Log(0,commonutil.GetBrand());
+        write2_MainUI_Log(0,commonutil.GetDeviceModel());
+        write2_MainUI_Log(0,"sdk" + commonutil.GetVersionSDK());
        //TODO: call test xxx
 
-        commonutil.wdbgLogcat(TAG, 0, "E AIR========================" +  testItem.gettestName());
-        write2MainUI("E AIR========================" + testItem.gettestName());
+        write2_MainUI_Log(0,"E=====" +  testItem.gettestName());
+
         dumpitem(testItem);
 
 
@@ -4229,5 +4233,10 @@ public class AllTestclass extends AppCompatActivity {
 
     void write2MainUI(final String log) {
         ((MainActivity) mcontext).writeLog2View(log);
+    }
+
+    void write2_MainUI_Log(int level, final String log) {
+        String writedlog = commonutil.wdbgLogcat(TAG, level, log);
+        ((MainActivity) mcontext).writeLog2View(writedlog);
     }
 }
