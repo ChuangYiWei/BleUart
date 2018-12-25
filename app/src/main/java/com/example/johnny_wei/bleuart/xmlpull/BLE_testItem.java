@@ -23,7 +23,11 @@ public class BLE_testItem {
     }
 
     public String getCmd() {
-        return cmdList.getFirst();
+        if (cmdList.size() != 0) {
+            return cmdList.getFirst();
+        } else {
+            return "cmd empty";
+        }
     }
 
     public void addCmd(String cmd) {

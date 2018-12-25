@@ -668,9 +668,9 @@ public class MainActivity extends AppCompatActivity {
             InputStream in_stream = asset.open("76xx.xml");
             String mode = "";
             if (0 == GetTestMode()) {
-                mode = "UART";
-            } else {
                 mode = "SPI";
+            } else {
+                mode = "UART";
             }
             List<BLE_testItem> list = XmlParser.getTestItems(in_stream, mode);
             for (BLE_testItem item : list) {
@@ -680,6 +680,7 @@ public class MainActivity extends AppCompatActivity {
                 Method method;
                 try {
                     //call function in bd_obj class
+                    Log.w(TAG, "start test:" + item.gettestName());
                     method = bd_obj.getClass().getDeclaredMethod(item.gettestName(), BLE_testItem.class);
                     int ret = (int) method.invoke(bd_obj, item);
                     Log.d(TAG, "ret:" + ret);
