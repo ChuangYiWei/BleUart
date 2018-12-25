@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<BC76xx>
+    <UART>
+        <item enable="1">
+            <func_name>BD_AddrWrite</func_name>
+            <data>01:23:45:67:89:0A</data>
+            <cmd>2533060A8967452301:263300</cmd>
+            <cmd>2033:2133060A8967452301</cmd>
+        </item>
+        <item enable="1">
+            <func_name>BD_AddrWrite</func_name>
+            <data>11:22:33:44:55:66</data>
+            <cmd>253306665544332211:263300</cmd>
+            <cmd>2033:213306665544332211</cmd>
+        </item>
+        <item enable="1">
+            <!--1000ms-->
+            <func_name>BD_IntvWrite</func_name>
+            <data>1000</data>
+            <cmd>253504E8030000:263500</cmd>
+            <cmd>2035:213504E8030000</cmd>
+        </item>
+    </UART>
+    <SPI>
+        <item enable="1">
+            <func_name>BD_IntvWrite</func_name>
+            <data>1000</data>
+            <cmd>A7253504E8030000:63263500</cmd>
+            <cmd>A22035:67213504E8030000</cmd>
+        </item>
+        <item enable="1">
+            <func_name>BD_IntvWrite</func_name>
+            <data>100</data>
+            <cmd>B7253504E8030000:63263500</cmd>
+            <cmd>B22035:67213504E8030000</cmd>
+        </item>
+    </SPI>
+</BC76xx>

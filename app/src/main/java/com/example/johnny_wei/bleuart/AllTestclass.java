@@ -10,6 +10,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import com.example.johnny_wei.bleuart.driver_pl2303.PL2303Driver;
 import com.example.johnny_wei.bleuart.util.commonutil;
+import com.example.johnny_wei.bleuart.xmlpull.BLE_testItem;
 
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -3565,6 +3566,29 @@ public class AllTestclass extends AppCompatActivity {
         }
         return true;
     }
+
+    public int BD_AddrWrite(BLE_testItem testItem)
+    {
+        Log.d(TAG, "gettestName:" + testItem.gettestName());
+        Log.d(TAG, "data:" + testItem.getdataStr());
+        Log.d(TAG, "cmd" + testItem.getCmd());
+        testItem.popCmd();
+        Log.d(TAG, "cmd:" + testItem.getCmd());
+        return 97;
+    }
+
+    public int BD_IntvWrite(BLE_testItem testItem)
+    {
+        Log.d(TAG, "\nfunc----------------------S");
+        Log.d(TAG, "gettestName:" + testItem.gettestName());
+        Log.d(TAG, "data:" + testItem.getdataStr());
+        Log.d(TAG, "cmd" + testItem.getCmd());
+        testItem.popCmd();
+        Log.d(TAG, "cmd:" + testItem.getCmd());
+        Log.d(TAG, "func----------------------E");
+        return 97;
+    }
+
 
     private void parseAdv(byte[] adv_data) {
         if (adv_data.length == 0) {

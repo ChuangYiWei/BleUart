@@ -37,6 +37,8 @@ import com.example.johnny_wei.bleuart.customview.RowItem;
 import com.example.johnny_wei.bleuart.customview.customAdapter;
 import com.example.johnny_wei.bleuart.driver_pl2303.PL2303Driver;
 import com.example.johnny_wei.bleuart.util.commonutil;
+import com.example.johnny_wei.bleuart.xmlpull.BLE_testItem;
+import com.example.johnny_wei.bleuart.xmlpull.XmlParser;
 
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
@@ -128,6 +130,7 @@ public class MainActivity extends AppCompatActivity {
             askPermissions();
         }
 
+       //TODO:open bt
        // enableBluetooth();
 
         init();
@@ -646,7 +649,8 @@ public class MainActivity extends AppCompatActivity {
             try {//TODO
                 for (int i = 0; i < 1 && isThreadRunning() ;i++) {
                     Log.w(TAG, "invokeAllTest:" + Integer.toString(i));
-                    invokeTest();
+                    //invokeTest();
+                    invokeTest2();
                 }
             } catch (IllegalAccessException e) {
                 e.printStackTrace();
@@ -656,6 +660,40 @@ public class MainActivity extends AppCompatActivity {
             writeStatus("stop");
         }
     };
+
+    private void invokeTest2() throws IllegalAccessException {
+        AssetManager asset = getAssets();
+        Log.d(TAG, "invokeTest start");
+        try {
+            InputStream in_stream = asset.open("76xx.xml");
+            String mode = "";
+            if (0 == GetTestMode()) {
+                mode = "UART";
+            } else {
+                mode = "SPI";
+            }
+            List<BLE_testItem> list = XmlParser.getTestItems(in_stream, mode);
+            for (BLE_testItem item : list) {
+                if (!isThreadRunning()) {
+                    break;
+                }
+                Method method;
+                try {
+                    //call function in bd_obj class
+                    method = bd_obj.getClass().getDeclaredMethod(item.gettestName(), BLE_testItem.class);
+                    int ret = (int) method.invoke(bd_obj, item);
+                    Log.d(TAG, "ret:" + ret);
+                } catch (NoSuchMethodException e) {
+                    e.printStackTrace();
+                } catch (InvocationTargetException e) {
+                    e.printStackTrace();
+                }
+            }
+            commonutil.wdbgLogcat(TAG, 0,"test done");
+        } catch (Throwable e) {
+            e.printStackTrace();
+        }
+    }
 
     private void invokeTest() throws IllegalAccessException {
         AssetManager asset = getAssets();
