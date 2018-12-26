@@ -198,7 +198,7 @@ public class AllTestclass extends AppCompatActivity {
 
         //the last test item of test_addr will set default
         if (name != null && device.getAddress().equals(defaultBleAddr)) {
-            write2MainUI("scan AD Data");
+            //write2MainUI("scan AD Data");
             //Log.d(TAG, "device name:" + device.getName() + ", device address:" + device.getAddress() + Integer.toString(rssi));
             //parseAdv(scanRecord);
             //name write check
@@ -439,7 +439,7 @@ public class AllTestclass extends AppCompatActivity {
     //if avg value < msec than return false
     private boolean checkAdvAvgIntv(long msec) {
         if (advIntvList.size() == 0) {
-            Log.d(TAG, "list size is 0");
+            commonutil.wdbgLogcat(TAG, 2, "list size is 0");
             return false;
         }
         long sum = 0;
@@ -449,12 +449,12 @@ public class AllTestclass extends AppCompatActivity {
         }
         long avgAdvIntv = sum / (advIntvList.size());
 
-        write2_MainUI_Log(0,"average adv Interval:" + avgAdvIntv);
+        write2_MainUI_Log(0, "average adv Interval:" + avgAdvIntv);
 
         //if avg value < msec
         if (avgAdvIntv < (msec * 0.8)) {
             String ErrStr = avgAdvIntv + " should be : " + msec + "ms";
-            write2_MainUI_Log(2,ErrStr);
+            write2_MainUI_Log(2, ErrStr);
             return false;
         }
 
@@ -2414,29 +2414,254 @@ public class AllTestclass extends AppCompatActivity {
     public int BD_AddrWrite(BLE_testItem testItem)
     {
         //todo:use tag name
-        //Current_TEST_NAME = BD_TEST_DISCONN_WRITE;
+        Current_TEST_NAME = BD_TEST_ADDR_WRITE;
 
-        write2_MainUI_Log(0,"S=====" + testItem.gettestName());
+        write2_MainUI_Log(0, "S=====" + testItem.gettestName());
 
-        write2_MainUI_Log(0,commonutil.GetBrand());
-        write2_MainUI_Log(0,commonutil.GetDeviceModel());
-        write2_MainUI_Log(0,"sdk" + commonutil.GetVersionSDK());
-       //TODO: call test xxx
+        if (!test_AddrWrite2(testItem)) {
+            write2_MainUI_Log(2, Current_TEST_NAME + " test fail");
+            ((MainActivity) mcontext).updateFailCnt();
+        } else {
+            write2_MainUI_Log(0, Current_TEST_NAME + " test success");
+            ((MainActivity) mcontext).updatesuccesstv();
+        }
 
         write2_MainUI_Log(0,"E=====" +  testItem.gettestName());
-
-        dumpitem(testItem);
-
-
         return 0;
+    }
+
+    public boolean test_AddrWrite2(BLE_testItem testitem)
+    {
+        //=====================UART======================
+
+        write2_MainUI_Log(0,"*****" + testitem.gettestName() + ",data is " + testitem.getdataStr());
+
+        //set ble name from config
+        setBleData(testitem.getdataStr());
+
+
+        int retryNum = 0;
+        int retryMax = 3;
+        if(commonutil.config.UART) {
+            while (testitem.cmdSize() > 0) {
+                String cmd = testitem.getCmd().split(":")[0];
+                String evt = testitem.getCmd().split(":")[1];
+
+
+                write2_MainUI_Log(0, "cmd:" + cmd + ", evt:" + evt);
+                //packet length more than 32 byte use "+" , ex:A0xxx+A2xxxx
+                String writeSubStrCmd[] = {""};
+                if (cmd.contains("+")) {
+                    writeSubStrCmd = cmd.split("\\+");
+                } else {
+                    writeSubStrCmd[0] = cmd;
+                }
+
+                //----uart tx-----> BLE
+                SystemClock.sleep(500);
+                if (_ST_SUCCESS_ == ((MainActivity) mcontext).uart_tx_command(writeSubStrCmd[0])) {
+                    //if tx length over 32 byte, transmit until finish
+                    int i;
+                    for (i = 1; i < writeSubStrCmd.length; i++) {
+                        SystemClock.sleep(500);
+                        if (_ST_SUCCESS_ != ((MainActivity) mcontext).uart_tx_command(writeSubStrCmd[i])) {
+                            write2_MainUI_Log(2, "tx fail,cmd:" + writeSubStrCmd[i]);
+                            return false;
+                        }
+                    }
+
+                    //uart rx <--- BLE
+                    SystemClock.sleep(500);
+                    byte[] rev = ((MainActivity) mcontext).uart_rx();
+
+                    if (rev.length != 0) {
+                        //check if uart rx recv incorrect size
+                        if (!checkRevLen(rev, TESTMODE)) {
+                            //work around, try three times if rev length not correct
+                            if (retryNum < retryMax) {
+                                write2_MainUI_Log(1, "retry " + Integer.toString(retryNum));
+                                retryNum++;
+                                continue;
+                            } else {
+                                String errEvtStr = ((MainActivity) mcontext).bytes2String(rev);
+                                write2_MainUI_Log(2, "retry fail errEvtStr:" + errEvtStr);
+                                return false;
+                            }
+                        }
+                    } else {
+                        write2_MainUI_Log(2, "rev length is 0");
+                    }
+
+                    //check expected string is correct or not
+                    String revEvt = ((MainActivity) mcontext).bytes2String(rev);
+                    if (revEvt.equals(evt)) {
+                        write2_MainUI_Log(0, "OK evt ,revEvt:" + revEvt);
+                    } else {
+                        write2_MainUI_Log(2, "fail evt ,revEvt:" + revEvt);
+                        return false;
+                    }
+
+                } else {
+                    write2_MainUI_Log(2, "fail tx ,cmd:" + writeSubStrCmd[0]);
+                    return false;
+                }
+
+                testitem.popCmd();
+            }
+        }
+
+        //=====================BLE======================
+        if(commonutil.config.BLE) {
+
+            curBleAddr = testitem.getdataStr();
+
+            long scanTime = 5000;
+            //start scan
+            scanLeDevice(true);
+            //wait finish
+            SystemClock.sleep(scanTime);
+            //stop scan
+            scanLeDevice(false);
+
+            //check if the name we modify exist
+            if(!getFindBleDataFlag()) {
+                write2_MainUI_Log(2, "can not find ble addr:" + curBleAddr);
+                return false;
+            }
+
+            SystemClock.sleep(500);
+        }
+
+        return true;
     }
 
     public int BD_IntvWrite(BLE_testItem testItem)
     {
-        Log.d(TAG, "\nfunc----------------------S");
-        dumpitem(testItem);
-        Log.d(TAG, "func----------------------E");
+        Current_TEST_NAME = BD_TEST_INTV_WRITE;
+
+        write2_MainUI_Log(0, "S=====" + testItem.gettestName());
+
+        if (!test_IntvWrite2(testItem)) {
+            write2_MainUI_Log(2, Current_TEST_NAME + " test fail");
+            ((MainActivity) mcontext).updateFailCnt();
+        } else {
+            write2_MainUI_Log(0, Current_TEST_NAME + " test success");
+            ((MainActivity) mcontext).updatesuccesstv();
+        }
+
+        write2_MainUI_Log(0,"E=====" +  testItem.gettestName());
         return 0;
+    }
+
+    public boolean test_IntvWrite2(BLE_testItem testitem)
+    {
+        //=====================UART======================
+
+        write2_MainUI_Log(0,"*****" + testitem.gettestName() + ",data is:" + testitem.getdataStr());
+        //adv interval
+        long advIntv = Long.parseLong(testitem.getdataStr());
+        commonutil.wdbgLogcat (TAG,0,"*****" + ",advIntv is " + advIntv);
+
+        int retryNum = 0;
+        int retryMax = 3;
+        if(commonutil.config.UART) {
+            while (testitem.cmdSize() > 0) {
+                String cmd = testitem.getCmd().split(":")[0];
+                String evt = testitem.getCmd().split(":")[1];
+
+                write2_MainUI_Log(0, "cmd:" + cmd + ", evt:" + evt);
+                //packet length more than 32 byte use "+" , ex:A0xxx+A2xxxx
+                String writeSubStrCmd[] = {""};
+                if (cmd.contains("+")) {
+                    writeSubStrCmd = cmd.split("\\+");
+                } else {
+                    writeSubStrCmd[0] = cmd;
+                }
+
+                //----uart tx-----> BLE
+                SystemClock.sleep(500);
+                if (_ST_SUCCESS_ == ((MainActivity) mcontext).uart_tx_command(writeSubStrCmd[0])) {
+                    //if tx length over 32 byte, transmit until finish
+                    int i;
+                    for (i = 1; i < writeSubStrCmd.length; i++) {
+                        SystemClock.sleep(500);
+                        if (_ST_SUCCESS_ != ((MainActivity) mcontext).uart_tx_command(writeSubStrCmd[i])) {
+                            write2_MainUI_Log(2, "tx fail,cmd:" + writeSubStrCmd[i]);
+                            return false;
+                        }
+                    }
+
+                    //uart rx <--- BLE
+                    SystemClock.sleep(500);
+                    byte[] rev = ((MainActivity) mcontext).uart_rx();
+
+                    if (rev.length != 0) {
+                        //check if uart rx recv incorrect size
+                        if (!checkRevLen(rev, TESTMODE)) {
+                            //work around, try three times if rev length not correct
+                            if (retryNum < retryMax) {
+                                write2_MainUI_Log(1, "retry " + Integer.toString(retryNum));
+                                retryNum++;
+                                continue;
+                            } else {
+                                String errEvtStr = ((MainActivity) mcontext).bytes2String(rev);
+                                write2_MainUI_Log(2, "retry fail errEvtStr:" + errEvtStr);
+                                return false;
+                            }
+                        }
+                    } else {
+                        write2_MainUI_Log(2, "rev length is 0");
+                    }
+
+                    //check expected string is correct or not
+                    String revEvt = ((MainActivity) mcontext).bytes2String(rev);
+                    if (revEvt.equals(evt)) {
+                        write2_MainUI_Log(0, "OK evt ,revEvt:" + revEvt);
+                    } else {
+                        write2_MainUI_Log(2, "fail evt ,revEvt:" + revEvt);
+                        return false;
+                    }
+
+                } else {
+                    write2_MainUI_Log(2, "fail tx ,cmd:" + writeSubStrCmd[0]);
+                    return false;
+                }
+
+                testitem.popCmd();
+            }
+        }
+
+        //=====================BLE======================
+        if(commonutil.config.BLE) {
+            // pass if adIntv is 0
+            if (advIntv == PASS) {
+                return true;
+            } else {
+                //make sure f/w really changes ad interval
+                write2_MainUI_Log(0, "wait AD change");
+                long sleep_time = advIntv * 5;
+                SystemClock.sleep(sleep_time);
+            }
+
+            long scanTime = advIntv * 10;
+            write2_MainUI_Log(0, "start scan AD interval:" + scanTime + " ms");
+
+            //start scan
+            scanLeDevice(true);
+            //wait finish
+            SystemClock.sleep(scanTime);
+            //stop scan
+            scanLeDevice(false);
+            //check average adv interval
+
+            if (!checkAdvAvgIntv(advIntv)) {
+                return false;
+            }
+
+            SystemClock.sleep(500);
+        }
+
+        return true;
     }
 
     public int BD_NameWrite(BLE_testItem testItem)
@@ -3711,6 +3936,8 @@ public class AllTestclass extends AppCompatActivity {
     }
 
     boolean checkRevLen(byte[] rev, int mode) {
+
+        mode = ((MainActivity) mcontext).GetTestMode();
         if (SPI_MODE == mode) {
             if (rev.length != 0 && rev.length > 1) {
                 if (rev[1] == 0x21 || rev[1] == 0x26 || rev[1] == 0x57) {
@@ -4062,7 +4289,7 @@ public class AllTestclass extends AppCompatActivity {
         ((MainActivity) mcontext).writeLog2View(log);
     }
 
-    void write2_MainUI_Log(int level, final String log) {
+    private void write2_MainUI_Log(int level, final String log) {
         String writedlog = commonutil.wdbgLogcat(TAG, level, log);
         ((MainActivity) mcontext).writeLog2View(writedlog);
     }

@@ -398,42 +398,6 @@
             <cmd>A425310131:63263100</cmd>
             <cmd>A22031:6421310131</cmd>
         </item>
-        <!--3, 11++++++++++++++++++++BDAddrWriteCmd BD_Addr(6 bytes, public, LSB)-->
-        <!--write 6 byte addr 設定成default addr-->
-        <item>
-            <func_name>BD_AddrWrite</func_name>
-            <data>01:23:45:67:89:0A</data>
-            <cmd>A92533060A8967452301:63263300</cmd>
-            <cmd>A22033:692133060A8967452301</cmd>
-        </item>
-        <!--write 6 byte addr-->
-        <item>
-            <func_name>BD_AddrWrite</func_name>
-            <data>11:22:33:44:55:66</data>
-            <cmd>A9253306665544332211:63263300</cmd>
-            <cmd>A22033:69213306665544332211</cmd>
-        </item>
-        <!--[write 5 byte less than 6 byte] LSB會是上一次addr的-->
-        <item>
-            <func_name>BD_AddrWrite</func_name>
-            <data>11:EE:DD:CC:BB:AA</data>
-            <cmd>A8253305AABBCCDDEE:63263300</cmd>
-            <cmd>A22033:69213306AABBCCDDEE11</cmd>
-        </item>
-        <!--[write 7 byte over than 6 byte] 只會抓到前六byte-->
-        <item>
-            <func_name>BD_AddrWrite</func_name>
-            <data>22:33:44:55:66:77</data>
-            <cmd>AA25330777665544332211:63263300</cmd>
-            <cmd>A22033:69213306776655443322</cmd>
-        </item>
-        <!--write 6 byte addr 設定成default addr-->
-        <item>
-            <func_name>BD_AddrWrite</func_name>
-            <data>01:23:45:67:89:0A</data>
-            <cmd>A92533060A8967452301:63263300</cmd>
-            <cmd>A22033:692133060A8967452301</cmd>
-        </item>
 
         <!--4++++++++++++++++++++AdvDataWriteCmd Length (up to 25 bytes), “Manufacturer Specific Data-->
         <!--[write 20 byte]-->

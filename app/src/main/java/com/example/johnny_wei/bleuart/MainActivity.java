@@ -400,18 +400,18 @@ public class MainActivity extends AppCompatActivity {
     {
         byte[] txByte = string2Bytes(command);
         if (null == mSerial) {
-            Log.d(TAG,"mSerial null");
+            write2_MainUI_Log(2,"mSerial null");
             return _ST_UST_HOST_NOT_SUPPORT_;
         }
 
         if (!mSerial.isConnected()) {
-            Log.d(TAG,"mSerial not connected");
+            write2_MainUI_Log(2,"mSerial not connected");
             return _ST_NOT_CONNECTED_;
         }
 
         int res = mSerial.write(txByte, txByte.length);
         if (res < 0) {
-            Log.d(TAG,"write fail");
+            write2_MainUI_Log(2,"write fail");
             return _ST_WRITE_FAIL_;
         }
 
@@ -862,4 +862,8 @@ public class MainActivity extends AppCompatActivity {
         return hours + ":" + minutes + ":" + seconds;
     }
 
+    private void write2_MainUI_Log(int level, final String log) {
+        String writedlog = commonutil.wdbgLogcat(TAG, level, log);
+        writeLog2View(writedlog);
+    }
 }
