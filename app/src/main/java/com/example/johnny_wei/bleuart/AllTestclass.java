@@ -2889,7 +2889,6 @@ public class AllTestclass extends AppCompatActivity {
                     writeSubStrCmd[0] = cmd;
                 }
 
-
                 //----uart tx-----> BLE
                 SystemClock.sleep(500);
                 if (_ST_SUCCESS_ == ((MainActivity) mcontext).uart_tx_command(writeSubStrCmd[0])) {
@@ -2929,15 +2928,12 @@ public class AllTestclass extends AppCompatActivity {
                     String revEvt = ((MainActivity) mcontext).bytes2String(rev);
                     if (revEvt.equals(evt)) {
                         write2_MainUI_Log(0, "OK evt ,revEvt:" + revEvt);
-
                     } else {
-                        ((MainActivity) mcontext).writeLog2View("fail evt ,revEvt:" + revEvt);
                         write2_MainUI_Log(2, "fail evt ,revEvt:" + revEvt);
                         return false;
                     }
 
                 } else {
-                    ((MainActivity) mcontext).writeLog2View("fail tx ,cmd:" + writeSubStrCmd[0]);
                     write2_MainUI_Log(2, "fail tx ,cmd:" + writeSubStrCmd[0]);
                     return false;
                 }
@@ -3103,7 +3099,6 @@ public class AllTestclass extends AppCompatActivity {
                     if (revEvt.equals(evt)) {
                         write2_MainUI_Log(0, "OK evt ,revEvt:" + revEvt);
                     } else {
-                        ((MainActivity) mcontext).writeLog2View("fail evt ,revEvt:" + revEvt);
                         write2_MainUI_Log(2, "fail evt ,revEvt:" + revEvt);
                         return false;
                     }
