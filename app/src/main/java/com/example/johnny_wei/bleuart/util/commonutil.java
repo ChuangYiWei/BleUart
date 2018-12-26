@@ -119,7 +119,7 @@ public class commonutil extends AppCompatActivity {
             return "";
         }
 
-        String dataWrited = getCurrentTimeStr().trim() + data;
+        String dataWrited = getCurrentTimeStr().trim() + "|" +data;
 
         data = getCurrentTimeStr().trim() + " : " + prefix + data + endLine;
         try {

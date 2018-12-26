@@ -93,12 +93,12 @@ public class XmlParser {
             while (eventType != XmlPullParser.END_DOCUMENT) {
                 switch (eventType) {
                     case XmlPullParser.START_DOCUMENT:
-                        Log.d("START_DOCUMENT","START_DOCUMENT");
+                        //Log.d("START_DOCUMENT","START_DOCUMENT");
                         break;
                     case XmlPullParser.START_TAG:
-                        Log.d("START_TAG", parser.getName());
+                        //Log.d("START_TAG", parser.getName());
                         if (parser.getName().equals(mode_str)) {
-                            Log.d(mode_str,"new ArrayList<BLE_testItem>");
+                          //  Log.d(mode_str,"new ArrayList<BLE_testItem>");
                             BLE_testItemList = new ArrayList<>();
                             select_mode = true;
                         }
@@ -107,14 +107,14 @@ public class XmlParser {
                         }
                         break;
                     case XmlPullParser.END_TAG:
-                        Log.d("END_TAG", parser.getName());
+                        //Log.d("END_TAG", parser.getName());
                         if (parser.getName().equals(mode_str)) {
-                            Log.d(mode_str, "select_mode false");
+//                            Log.d(mode_str, "select_mode false");
                             select_mode = false;
                         }
                         if (select_mode) {
                             if (parser.getName().equals("item")) {
-                                Log.d("/item", "/item");
+//                                Log.d("/item", "/item");
                                 BLE_testItemList.add(obj_ble_testitem);
                                 obj_ble_testitem = null;
                             }
@@ -134,15 +134,15 @@ public class XmlParser {
 
     private static BLE_testItem addItem(BLE_testItem obj_ble_testitem, XmlPullParser parser) throws IOException, XmlPullParserException {
         if (parser.getName().equals(ITEM)) {
-            Log.d("item", "meet item new obj");
+//            Log.d("item", "meet item new obj");
             obj_ble_testitem = new BLE_testItem();
         } else if (parser.getName().equals(FUNC_NAME)) {
             obj_ble_testitem.settestName(parser.nextText());
         } else if (parser.getName().equals(DATA)) {
-            Log.d("data", "data");
+//            Log.d("data", "data");
             obj_ble_testitem.setdataStr(parser.nextText());
         } else if (parser.getName().equals(CMD)) {
-            Log.d("cmd", "cmd");
+//            Log.d("cmd", "cmd");
             obj_ble_testitem.addCmd(parser.nextText());
         }
         return obj_ble_testitem;

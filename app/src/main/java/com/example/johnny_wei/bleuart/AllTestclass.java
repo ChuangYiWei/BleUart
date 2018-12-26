@@ -3688,8 +3688,103 @@ public class AllTestclass extends AppCompatActivity {
     //air
     public int AIR_BD_AddrWrite(BLE_testItem testItem)
     {
-        dumpitem(testItem);
+        //todo:use tag name
+        Current_TEST_NAME = BD_TEST_ADDR_WRITE;
+
+        write2_MainUI_Log(0, "S=====" + testItem.gettestName());
+
+        if (!test_air_addrwrite2(testItem)) {
+            write2_MainUI_Log(2, Current_TEST_NAME + " test fail");
+            ((MainActivity) mcontext).updateFailCnt();
+        } else {
+            write2_MainUI_Log(0, Current_TEST_NAME + " test success");
+            ((MainActivity) mcontext).updatesuccesstv();
+        }
+
+        //disconnect no matter success or fail
+        bleServiceInstance.disconnect();
+        SystemClock.sleep(3000);
+
+        write2_MainUI_Log(0,"E=====" +  testItem.gettestName());
+
         return 0;
+    }
+
+    public boolean test_air_addrwrite2(BLE_testItem testitem)
+    {
+        write2_MainUI_Log(0,"*****" + testitem.gettestName() + ",data is " + testitem.getdataStr());
+        setDefaultBleData();
+        //set ble name from config
+        setBleData(testitem.getdataStr());
+
+        //=====================connection======================
+        if (commonutil.config.BLE) {
+            bleServiceInstance = ((MainActivity) mcontext).getBleServiceInstance();
+            if (null == bleServiceInstance) {
+                commonutil.wdbgLogcat(TAG,2,"bleServiceInstance is null, ble service not start yet ?");
+                return false;
+            }
+
+            //check connect or not, retry connect 3 times if connection fail
+            if (!bleServiceInstance.isConnected()) {
+                if (!connectRetry()) {
+                    return false;
+                }
+            }
+
+            //=====================enable notify======================
+            bleServiceInstance.setCharacteristicNotify(SERVICE_UUID, NOTIFY_CHARA_UUID, WRITE_DESCRIPTOR_UUID);
+            SystemClock.sleep(2000);
+
+            while (testitem.cmdSize() > 0) {
+                //clear last event
+                bleServiceInstance.clearCharChagedstr();
+
+                String cmd = testitem.getCmd().split(":")[0];
+                String evt = testitem.getCmd().split(":")[1];
+
+                commonutil.wdbgLogcat(TAG,0,"cmd:" + cmd + "evt:" + evt);
+                byte[] bytes = ((MainActivity) mcontext).string2Bytes(cmd);
+
+                //write command
+                bleServiceInstance.writeCharaval(SERVICE_UUID,WRITE_CHARA_UUID,bytes);
+                SystemClock.sleep(1000);
+
+                //check write evt string is correct or not
+                String revEvt = bleServiceInstance.getCharChagedstr();
+                if (revEvt.equals(evt)) {
+                    write2_MainUI_Log(0,"OK evt ,revEvt:" + revEvt);
+                } else {
+                    write2_MainUI_Log(2,"fail evt ,revEvt:" + revEvt);
+                    return false;
+                }
+
+                testitem.popCmd();
+            }
+
+            //---------------------disconnect
+            bleServiceInstance.disconnect();
+            SystemClock.sleep(3000);
+
+            //set new addr
+            curBleAddr = testitem.getdataStr();
+
+            //---------------------scan
+            long scanTime = 5000;
+            //start scan
+            scanLeDevice(true);
+            //wait finish
+            SystemClock.sleep(scanTime);
+            //-------------------stop scan
+            scanLeDevice(false);
+
+            //check if the name we modify exist
+            if(!getFindBleDataFlag()) {
+                write2_MainUI_Log(2,"can not find ble name:" + testitem.getdataStr());
+                return false;
+            }
+        }
+        return true;
     }
 
     public int AIR_BD_IntvWrite(BLE_testItem testItem)

@@ -130,8 +130,7 @@ public class MainActivity extends AppCompatActivity {
             askPermissions();
         }
 
-       //TODO:open bt
-       // enableBluetooth();
+        enableBluetooth();
 
         init();
 
@@ -693,7 +692,7 @@ public class MainActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
             }
-            commonutil.wdbgLogcat(TAG, 0,"test done");
+            commonutil.wdbgLogcat(TAG, 0,"one round done");
         } catch (Throwable e) {
             e.printStackTrace();
         }
