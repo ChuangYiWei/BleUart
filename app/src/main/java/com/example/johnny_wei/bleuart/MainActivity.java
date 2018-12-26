@@ -195,7 +195,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    //return mode index,//0:spi, 1:uart
+    //return mode index,//0:spi, 1:uart, 2:air_uart
     public int GetTestMode(){
         return modeIdx;
     }

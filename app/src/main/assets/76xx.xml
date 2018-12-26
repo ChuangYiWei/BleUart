@@ -731,45 +731,19 @@
 
         <!--4++++++++++++++++++++AdvDataWriteCmd Length (up to 25 bytes), “Manufacturer Specific Data-->
         <!--&lt;!&ndash;[write 20 byte]&ndash;&gt;-->
-        <!--<item>-->
-            <!--<func_name>AIR_BD_AdvDataWrite</func_name>-->
-            <!--<data>020105030312180319C10308095E5F6061626364</data>-->
-            <!--<cmd>253614020105030312180319C10308095E5F6061626364:263600</cmd>-->
-            <!--<cmd>2036:213614020105030312180319C10308095E5F6061626364</cmd>-->
-        <!--</item>-->
-        <!--[write 3 byte]-->
+
+        [write 3 byte]
         <item>
             <func_name>AIR_BD_AdvDataWrite</func_name>
             <data>010203</data>
             <cmd>253603010203:263600</cmd>
             <cmd>2036:213603010203</cmd>
         </item>
-        <!--&lt;!&ndash;[write 26 byte over 25(max) byte] 只寫25 byte&ndash;&gt;-->
-        <!--<item>-->
-            <!--<func_name>AIR_BD_AdvDataWrite</func_name>-->
-            <!--<data>0201040303E0FF0BFFFFFF0000CE553AEDD0CC050961626306</data>-->
-            <!--<cmd>25361A0201040303E0FF0BFFFFFF0000CE553AEDD0CC05096162630607:263600</cmd>-->
-            <!--<cmd>2036:2136190201040303E0FF0BFFFFFF0000CE553AEDD0CC050961626306</cmd>-->
-        <!--</item>-->
+        <!--[write 26 byte over 25(max) byte] 只寫25 byte-->
+
 
         <!--4++++++++++++++++++++WhiteListWriteCmd Connectable device address – white list(6 bytes, LSB)-->
         <!--0:means all devices can connect-->
-
-        <!--&lt;!&ndash;[write samsung] &ndash;&gt;-->
-        <!--<item>-->
-            <!--<func_name>AIR_BD_WhiteListWrite</func_name>-->
-            <!--<data>samsung</data>-->
-            <!--<cmd>253706A21308CF31D8:263700</cmd>-->
-            <!--<cmd>2037:213706A21308CF31D8</cmd>-->
-        <!--</item>-->
-
-        <!--&lt;!&ndash;[write 0] all pass&ndash;&gt;-->
-        <!--<item>-->
-            <!--<func_name>AIR_BD_WhiteListWrite</func_name>-->
-            <!--<data>ALLPASS</data>-->
-            <!--<cmd>253706000000000000:263700</cmd>-->
-            <!--<cmd>2037:213706000000000000</cmd>-->
-        <!--</item>-->
 
         <!--++++++++++++++++++++TxPowerWriteCmd TxPwr (1 byte)0: 3dBm 1: 0dBm Others: Reserved-->
         <!--fixed len: 1 byte-->
@@ -827,12 +801,6 @@
         <!--(up to 31 bytes, whole Advertising Data field value, MSB)-->
         <!--fixed len: 31 byte-->
 
-        <!--[write len=31 max]-->
-        <!--<item>-->
-            <!--<func_name>AIR_BD_AdvDataWrite2</func_name>-->
-            <!--<data>0201060302F0FF179999999999999999999999999999999999999999999999</data>-->
-            <!--<cmd>25501F0201060302F0FF17999999999999999999999999999999999999999999+9999:265000</cmd>-->
-        <!--</item>-->
         <!--[write len=14]-->
         <item>
             <func_name>AIR_BD_AdvDataWrite2</func_name>
@@ -854,13 +822,6 @@
             <data>0201060409383838</data>
             <cmd>2551080201060409383838:265100</cmd>
         </item>
-        <!--&lt;!&ndash;[write len=31]&ndash;&gt;-->
-        <!--<item>-->
-            <!--<func_name>AIR_BD_ScanResDataWrite</func_name>-->
-            <!--<data>0201060302F0FF07170102030405060F094441524B5F4B4E494748545F</data>-->
-            <!--<cmd>25511F0201060302F0FF07170102030405060F094441524B5F4B4E494748545F+474F:265100</cmd>-->
-        <!--</item>-->
-
 
         <!--++++++++++++++++++++DisconnectWriteCmd -->
         <!--[write len=0 OK] 沒連線會收到 63265F01,有連線則63265F00,然後會收到 event packet of 26FF10-->
@@ -875,12 +836,12 @@
         <!--5 byte-->
         <item>
             <func_name>AIR_BD_DataPayloadWrite</func_name>
-            <data>3031323334</data>
+            <data>22053031323334</data>
             <cmd>22053031323334:NA</cmd>
         </item>
         <!--18 byte-->
         <item>
-            <func_name>BD_DataPayloadWrite</func_name>
+            <func_name>AIR_BD_DataPayloadWrite</func_name>
             <data>22124142434445464748494A4B4C4D4E4F505152</data>
             <cmd>22124142434445464748494A4B4C4D4E4F505152:NA</cmd>
         </item>

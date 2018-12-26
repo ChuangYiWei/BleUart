@@ -459,6 +459,7 @@ public class bleService extends Service {
             BluetoothGattCharacteristic chara = service.getCharacteristic(chara_uuid);
             chara.setValue(bytes);
             if (!mBluetoothGatt.writeCharacteristic(chara)) {
+                commonutil.wdbgLogcat(TAG, 2, "write characteristic fail");
                 Log.e(TAG, "write characteristic fail");
             }
         } else {
