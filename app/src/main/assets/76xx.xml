@@ -243,19 +243,19 @@
         <item>
         <func_name>BD_DataPayloadWrite</func_name>
         <data>3031323334</data>
-        <cmd>22053031323334:NA</cmd>
+        <cmd>22053031323334:262200</cmd>
         </item>
         <!--20 byte-->
         <item>
         <func_name>BD_DataPayloadWrite</func_name>
         <data>4142434445464748494A4B4C4D4E4F5051525354</data>
-        <cmd>22144142434445464748494A4B4C4D4E4F5051525354:NA</cmd>
+        <cmd>22144142434445464748494A4B4C4D4E4F5051525354:262200</cmd>
         </item>
         <!--50byte-->
         <item>
         <func_name>BD_DataPayloadWrite</func_name>
         <data>6162636465666768696A6B6C6D6E6F707172737475767778797A7B7C7D7E7EB47F808182838485868788898A8B8C8D8E8F90</data>
-        <cmd>22326162636465666768696A6B6C6D6E6F707172737475767778797A7B7C7D7E+7EB47F808182838485868788898A8B8C8D8E8F90:NA</cmd>
+        <cmd>22326162636465666768696A6B6C6D6E6F707172737475767778797A7B7C7D7E+7EB47F808182838485868788898A8B8C8D8E8F90:262200</cmd>
         </item>
 
 
@@ -290,6 +290,12 @@
             <func_name>BD_phy</func_name>
             <data>1</data>
             <cmd>560194042000:57010000940420000400B0A0</cmd>
+        </item>
+
+        <item>
+            <func_name>BD_changeBaudRate</func_name>
+            <data>1</data>
+            <cmd>NA</cmd>
         </item>
     </UART>
 <!--===================================================-->
@@ -591,6 +597,12 @@
             <func_name>BD_phy</func_name>
             <data>1</data>
             <cmd>A6560194042000:6C57010000940420000400B0A0</cmd>
+        </item>
+
+        <item>
+            <testName>BD_changeBaudRate</testName>
+            <data>1</data>
+            <cmd>NA</cmd>
         </item>
     </SPI>
 
