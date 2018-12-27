@@ -79,14 +79,14 @@ public class AllTestclass extends AppCompatActivity {
     private final String PHY_FUNC_ADDR = "94042000";
 
     //ble
-//    String defaultBleAddr = "01:23:45:67:89:0A";
+    String defaultBleAddr = "01:23:45:67:89:0A";
     String defaultBleAddr2018 = "20:18:11:30:18:34";
     String defaultBleAddr2018_10_02 = "20:18:99:99:99:99";
-//    String curBleAddr = defaultBleAddr2018;
+    String curBleAddr = defaultBleAddr2018;
 
     //test
-    String curBleAddr = defaultBleAddr2018;
-    String defaultBleAddr = curBleAddr;
+//    String curBleAddr = defaultBleAddr2018;
+//    String defaultBleAddr = curBleAddr;
 
     private static final long SCAN_PERIOD = 5000;
     private Handler m_userHandler;
@@ -2224,6 +2224,8 @@ public class AllTestclass extends AppCompatActivity {
         commonutil.wdbgLogcat(TAG, 0, "newBaudRate is" + Integer.toString(newBaudRate));
         ((MainActivity) mcontext).writeLog2View("newBaudRate is" + Integer.toString(newBaudRate));
 
+        TESTMODE = ((MainActivity) mcontext).GetTestMode();
+
         /*baud rate write-------------------------------*/
         int result = -1;
         if (_ST_SUCCESS_ != ((MainActivity) mcontext).uart_tx_command(GetBRwriteCmd(newBaudRate, TESTMODE))) {
@@ -2379,101 +2381,43 @@ public class AllTestclass extends AppCompatActivity {
 
         write2_MainUI_Log(0, "*****" + testitem.gettestName() + ",data is " + testitem.getdataStr());
 
+        setDefaultBleData();
         //set ble name from config
         setBleData(testitem.getdataStr());
 
+        while (testitem.cmdSize() > 0) {
+            String evt = testitem.getCmd().split(":")[1];
+            String revEvt = send_uart_Cmd(testitem, RETRYMAX);
 
-        int retryNum = 0;
-        int retryMax = 3;
-        if (commonutil.config.UART) {
-            while (testitem.cmdSize() > 0) {
-                String cmd = testitem.getCmd().split(":")[0];
-                String evt = testitem.getCmd().split(":")[1];
-
-
-                write2_MainUI_Log(0, "cmd:" + cmd + ", evt:" + evt);
-                //packet length more than 32 byte use "+" , ex:A0xxx+A2xxxx
-                String writeSubStrCmd[] = {""};
-                if (cmd.contains("+")) {
-                    writeSubStrCmd = cmd.split("\\+");
-                } else {
-                    writeSubStrCmd[0] = cmd;
-                }
-
-                //----uart tx-----> BLE
-                SystemClock.sleep(500);
-                if (_ST_SUCCESS_ == ((MainActivity) mcontext).uart_tx_command(writeSubStrCmd[0])) {
-                    //if tx length over 32 byte, transmit until finish
-                    int i;
-                    for (i = 1; i < writeSubStrCmd.length; i++) {
-                        SystemClock.sleep(500);
-                        if (_ST_SUCCESS_ != ((MainActivity) mcontext).uart_tx_command(writeSubStrCmd[i])) {
-                            write2_MainUI_Log(2, "tx fail,cmd:" + writeSubStrCmd[i]);
-                            return false;
-                        }
-                    }
-
-                    //uart rx <--- BLE
-                    SystemClock.sleep(500);
-                    byte[] rev = ((MainActivity) mcontext).uart_rx();
-
-                    if (rev.length != 0) {
-                        //check if uart rx recv incorrect size
-                        if (!checkRevLen(rev, TESTMODE)) {
-                            //work around, try three times if rev length not correct
-                            if (retryNum < retryMax) {
-                                write2_MainUI_Log(1, "retry " + Integer.toString(retryNum));
-                                retryNum++;
-                                continue;
-                            } else {
-                                String errEvtStr = ((MainActivity) mcontext).bytes2String(rev);
-                                write2_MainUI_Log(2, "retry fail errEvtStr:" + errEvtStr);
-                                return false;
-                            }
-                        }
-                    } else {
-                        write2_MainUI_Log(2, "rev length is 0");
-                    }
-
-                    //check expected string is correct or not
-                    String revEvt = ((MainActivity) mcontext).bytes2String(rev);
-                    if (revEvt.equals(evt)) {
-                        write2_MainUI_Log(0, "OK evt ,revEvt:" + revEvt);
-                    } else {
-                        write2_MainUI_Log(2, "fail evt ,revEvt:" + revEvt);
-                        return false;
-                    }
-
-                } else {
-                    write2_MainUI_Log(2, "fail tx ,cmd:" + writeSubStrCmd[0]);
-                    return false;
-                }
-
-                testitem.popCmd();
+            //check expected string is correct or not
+            if (revEvt.equals(evt)) {
+                write2_MainUI_Log(0, "OK evt ,revEvt:" + revEvt);
+            } else {
+                write2_MainUI_Log(2, "fail evt ,revEvt:" + revEvt);
+                return false;
             }
+            testitem.popCmd();
         }
 
         //=====================BLE======================
-        if (commonutil.config.BLE) {
+        curBleAddr = testitem.getdataStr();
 
-            curBleAddr = testitem.getdataStr();
+        long scanTime = 5000;
+        //start scan
+        scanLeDevice(true);
+        //wait finish
+        SystemClock.sleep(scanTime);
+        //stop scan
+        scanLeDevice(false);
 
-            long scanTime = 5000;
-            //start scan
-            scanLeDevice(true);
-            //wait finish
-            SystemClock.sleep(scanTime);
-            //stop scan
-            scanLeDevice(false);
-
-            //check if the name we modify exist
-            if (!getFindBleDataFlag()) {
-                write2_MainUI_Log(2, "can not find ble addr:" + curBleAddr);
-                return false;
-            }
-
-            SystemClock.sleep(500);
+        //check if the name we modify exist
+        if (!getFindBleDataFlag()) {
+            write2_MainUI_Log(2, "can not find ble addr:" + curBleAddr);
+            return false;
         }
+
+        SystemClock.sleep(500);
+
 
         return true;
     }
@@ -2503,73 +2447,18 @@ public class AllTestclass extends AppCompatActivity {
         long advIntv = Long.parseLong(testitem.getdataStr());
         commonutil.wdbgLogcat(TAG, 0, "*****" + ",advIntv is " + advIntv);
 
-        int retryNum = 0;
-        int retryMax = 3;
-        if (commonutil.config.UART) {
-            while (testitem.cmdSize() > 0) {
-                String cmd = testitem.getCmd().split(":")[0];
-                String evt = testitem.getCmd().split(":")[1];
+        while (testitem.cmdSize() > 0) {
+            String evt = testitem.getCmd().split(":")[1];
+            String revEvt = send_uart_Cmd(testitem,  RETRYMAX);
 
-                write2_MainUI_Log(0, "cmd:" + cmd + ", evt:" + evt);
-                //packet length more than 32 byte use "+" , ex:A0xxx+A2xxxx
-                String writeSubStrCmd[] = {""};
-                if (cmd.contains("+")) {
-                    writeSubStrCmd = cmd.split("\\+");
-                } else {
-                    writeSubStrCmd[0] = cmd;
-                }
-
-                //----uart tx-----> BLE
-                SystemClock.sleep(500);
-                if (_ST_SUCCESS_ == ((MainActivity) mcontext).uart_tx_command(writeSubStrCmd[0])) {
-                    //if tx length over 32 byte, transmit until finish
-                    int i;
-                    for (i = 1; i < writeSubStrCmd.length; i++) {
-                        SystemClock.sleep(500);
-                        if (_ST_SUCCESS_ != ((MainActivity) mcontext).uart_tx_command(writeSubStrCmd[i])) {
-                            write2_MainUI_Log(2, "tx fail,cmd:" + writeSubStrCmd[i]);
-                            return false;
-                        }
-                    }
-
-                    //uart rx <--- BLE
-                    SystemClock.sleep(500);
-                    byte[] rev = ((MainActivity) mcontext).uart_rx();
-
-                    if (rev.length != 0) {
-                        //check if uart rx recv incorrect size
-                        if (!checkRevLen(rev, TESTMODE)) {
-                            //work around, try three times if rev length not correct
-                            if (retryNum < retryMax) {
-                                write2_MainUI_Log(1, "retry " + Integer.toString(retryNum));
-                                retryNum++;
-                                continue;
-                            } else {
-                                String errEvtStr = ((MainActivity) mcontext).bytes2String(rev);
-                                write2_MainUI_Log(2, "retry fail errEvtStr:" + errEvtStr);
-                                return false;
-                            }
-                        }
-                    } else {
-                        write2_MainUI_Log(2, "rev length is 0");
-                    }
-
-                    //check expected string is correct or not
-                    String revEvt = ((MainActivity) mcontext).bytes2String(rev);
-                    if (revEvt.equals(evt)) {
-                        write2_MainUI_Log(0, "OK evt ,revEvt:" + revEvt);
-                    } else {
-                        write2_MainUI_Log(2, "fail evt ,revEvt:" + revEvt);
-                        return false;
-                    }
-
-                } else {
-                    write2_MainUI_Log(2, "fail tx ,cmd:" + writeSubStrCmd[0]);
-                    return false;
-                }
-
-                testitem.popCmd();
+            //check expected string is correct or not
+            if (revEvt.equals(evt)) {
+                write2_MainUI_Log(0, "OK evt ,revEvt:" + revEvt);
+            } else {
+                write2_MainUI_Log(2, "fail evt ,revEvt:" + revEvt);
+                return false;
             }
+            testitem.popCmd();
         }
 
         //=====================BLE======================
@@ -2627,77 +2516,22 @@ public class AllTestclass extends AppCompatActivity {
 
         write2_MainUI_Log(0, "*****" + testitem.gettestName() + ",data is:" + testitem.getdataStr());
 
+        setDefaultBleData();
         //set ble name from config
         setBleData(testitem.getdataStr());
 
-        int retryNum = 0;
-        int retryMax = 3;
-        if (commonutil.config.UART) {
-            while (testitem.cmdSize() > 0) {
-                String cmd = testitem.getCmd().split(":")[0];
-                String evt = testitem.getCmd().split(":")[1];
+        while (testitem.cmdSize() > 0) {
+            String evt = testitem.getCmd().split(":")[1];
+            String revEvt = send_uart_Cmd(testitem,  RETRYMAX);
 
-                write2_MainUI_Log(0, "cmd:" + cmd + ", evt:" + evt);
-
-                //packet length more than 32 byte use "+" , ex:A0xxx+A2xxxx
-                String writeSubStrCmd[] = {""};
-                if (cmd.contains("+")) {
-                    writeSubStrCmd = cmd.split("\\+");
-                } else {
-                    writeSubStrCmd[0] = cmd;
-                }
-
-                //----uart tx-----> BLE
-                SystemClock.sleep(500);
-                if (_ST_SUCCESS_ == ((MainActivity) mcontext).uart_tx_command(writeSubStrCmd[0])) {
-                    //if tx length over 32 byte, transmit until finish
-                    int i;
-                    for (i = 1; i < writeSubStrCmd.length; i++) {
-                        SystemClock.sleep(500);
-                        if (_ST_SUCCESS_ != ((MainActivity) mcontext).uart_tx_command(writeSubStrCmd[i])) {
-                            write2_MainUI_Log(2, "tx fail,cmd:" + writeSubStrCmd[i]);
-                            return false;
-                        }
-                    }
-
-                    //uart rx <--- BLE
-                    SystemClock.sleep(500);
-                    byte[] rev = ((MainActivity) mcontext).uart_rx();
-
-                    if (rev.length != 0) {
-                        //check if uart rx recv incorrect size
-                        if (!checkRevLen(rev, TESTMODE)) {
-                            //work around, try three times if rev length not correct
-                            if (retryNum < retryMax) {
-                                write2_MainUI_Log(1, "retry " + Integer.toString(retryNum));
-                                retryNum++;
-                                continue;
-                            } else {
-                                String errEvtStr = ((MainActivity) mcontext).bytes2String(rev);
-                                write2_MainUI_Log(2, "retry fail errEvtStr:" + errEvtStr);
-                                return false;
-                            }
-                        }
-                    } else {
-                        write2_MainUI_Log(2, "rev length is 0");
-                    }
-
-                    //check expected string is correct or not
-                    String revEvt = ((MainActivity) mcontext).bytes2String(rev);
-                    if (revEvt.equals(evt)) {
-                        write2_MainUI_Log(0, "OK evt ,revEvt:" + revEvt);
-                    } else {
-                        write2_MainUI_Log(2, "fail evt ,revEvt:" + revEvt);
-                        return false;
-                    }
-
-                } else {
-                    write2_MainUI_Log(2, "fail tx ,cmd:" + writeSubStrCmd[0]);
-                    return false;
-                }
-
-                testitem.popCmd();
+            //check expected string is correct or not
+            if (revEvt.equals(evt)) {
+                write2_MainUI_Log(0, "OK evt ,revEvt:" + revEvt);
+            } else {
+                write2_MainUI_Log(2, "fail evt ,revEvt:" + revEvt);
+                return false;
             }
+            testitem.popCmd();
         }
 
         //=====================BLE======================
@@ -2740,74 +2574,12 @@ public class AllTestclass extends AppCompatActivity {
             write2_MainUI_Log(0, "E=====" + testItem.gettestName());
         }
 
-        //todo:open
+
         //only test once because advdatawirte function will not work after we call advdatawrite2
-        //advWriteTestOnlyOnce = 1;
+        advWriteTestOnlyOnce = 1;
         return 0;
     }
 
-
-
-
-    String send_uart_Cmd(BLE_testItem testitem, int current_retryNum, final int retryMax) {
-        String cmd = testitem.getCmd().split(":")[0];
-        String evt = testitem.getCmd().split(":")[1];
-
-        write2_MainUI_Log(0, "cmd:" + cmd + ", evt:" + evt);
-
-        //packet length more than 32 byte use "+" , ex:A0xxx+A2xxxx
-        String writeSubStrCmd[] = {""};
-        if (cmd.contains("+")) {
-            writeSubStrCmd = cmd.split("\\+");
-        } else {
-            writeSubStrCmd[0] = cmd;
-        }
-
-        //----uart tx-----> BLE
-        SystemClock.sleep(500);
-        byte[] rev;
-        if (_ST_SUCCESS_ == ((MainActivity) mcontext).uart_tx_command(writeSubStrCmd[0])) {
-            //if tx length over 32 byte, transmit until finish
-            int i;
-            for (i = 1; i < writeSubStrCmd.length; i++) {
-                SystemClock.sleep(500);
-                if (_ST_SUCCESS_ != ((MainActivity) mcontext).uart_tx_command(writeSubStrCmd[i])) {
-                    write2_MainUI_Log(2, "tx fail,cmd:" + writeSubStrCmd[i]);
-                    return FAIL;
-                }
-            }
-
-            //uart rx <--- BLE
-            SystemClock.sleep(500);
-            rev = ((MainActivity) mcontext).uart_rx();
-
-            if (rev.length != 0) {
-                //check if uart rx recv incorrect size
-                if (!checkRevLen(rev, TESTMODE)) {
-                    //work around, try three times if rev length not correct
-                    if (current_retryNum < retryMax) {
-                        write2_MainUI_Log(1, "retry " + Integer.toString(current_retryNum));
-                        current_retryNum++;
-                        //call self again
-                        send_uart_Cmd(testitem, current_retryNum, RETRYMAX);
-                    } else {
-                        String errEvtStr = ((MainActivity) mcontext).bytes2String(rev);
-                        write2_MainUI_Log(2, "retry fail errEvtStr:" + errEvtStr);
-                        return FAIL;
-                    }
-                }
-            } else {
-                write2_MainUI_Log(2, "rev length is 0");
-            }
-
-
-        } else {
-            write2_MainUI_Log(2, "fail tx ,cmd:" + writeSubStrCmd[0]);
-            return FAIL;
-        }
-
-        return ((MainActivity) mcontext).bytes2String(rev);
-    }
 
     public boolean test_AdvDataWrite2(BLE_testItem testitem) {
         //=====================UART======================
@@ -2820,7 +2592,7 @@ public class AllTestclass extends AppCompatActivity {
 
         while (testitem.cmdSize() > 0) {
             String evt = testitem.getCmd().split(":")[1];
-            String revEvt = send_uart_Cmd(testitem, 0, RETRYMAX);
+            String revEvt = send_uart_Cmd(testitem,  RETRYMAX);
 
             //check expected string is correct or not
             if (revEvt.equals(evt)) {
@@ -2850,7 +2622,6 @@ public class AllTestclass extends AppCompatActivity {
 
         SystemClock.sleep(500);
 
-
         return true;
     }
 
@@ -2879,77 +2650,18 @@ public class AllTestclass extends AppCompatActivity {
 
         write2_MainUI_Log(0, "*****" + testitem.gettestName() + ",data is:" + testitem.getdataStr());
 
-        //set ble name from config
-        setBleData(testitem.getdataStr());
+        while (testitem.cmdSize() > 0) {
+            String evt = testitem.getCmd().split(":")[1];
+            String revEvt = send_uart_Cmd(testitem,  RETRYMAX);
 
-        int retryNum = 0;
-        int retryMax = 3;
-        if (commonutil.config.UART) {
-            while (testitem.cmdSize() > 0) {
-                String cmd = testitem.getCmd().split(":")[0];
-                String evt = testitem.getCmd().split(":")[1];
-
-                write2_MainUI_Log(0, "cmd:" + cmd + ", evt:" + evt);
-
-                //packet length more than 32 byte use "+" , ex:A0xxx+A2xxxx
-                String writeSubStrCmd[] = {""};
-                if (cmd.contains("+")) {
-                    writeSubStrCmd = cmd.split("\\+");
-                } else {
-                    writeSubStrCmd[0] = cmd;
-                }
-
-                //----uart tx-----> BLE
-                SystemClock.sleep(500);
-                if (_ST_SUCCESS_ == ((MainActivity) mcontext).uart_tx_command(writeSubStrCmd[0])) {
-                    //if tx length over 32 byte, transmit until finish
-                    int i;
-                    for (i = 1; i < writeSubStrCmd.length; i++) {
-                        SystemClock.sleep(500);
-                        if (_ST_SUCCESS_ != ((MainActivity) mcontext).uart_tx_command(writeSubStrCmd[i])) {
-                            write2_MainUI_Log(2, "tx fail,cmd:" + writeSubStrCmd[i]);
-                            return false;
-                        }
-                    }
-
-                    //uart rx <--- BLE
-                    SystemClock.sleep(500);
-                    byte[] rev = ((MainActivity) mcontext).uart_rx();
-
-                    if (rev.length != 0) {
-                        //check if uart rx recv incorrect size
-                        if (!checkRevLen(rev, TESTMODE)) {
-                            //work around, try three times if rev length not correct
-                            if (retryNum < retryMax) {
-                                write2_MainUI_Log(1, "retry " + Integer.toString(retryNum));
-                                retryNum++;
-                                continue;
-                            } else {
-                                String errEvtStr = ((MainActivity) mcontext).bytes2String(rev);
-                                write2_MainUI_Log(2, "retry fail errEvtStr:" + errEvtStr);
-                                return false;
-                            }
-                        }
-                    } else {
-                        write2_MainUI_Log(2, "rev length is 0");
-                    }
-
-                    //check expected string is correct or not
-                    String revEvt = ((MainActivity) mcontext).bytes2String(rev);
-                    if (revEvt.equals(evt)) {
-                        write2_MainUI_Log(0, "OK evt ,revEvt:" + revEvt);
-                    } else {
-                        write2_MainUI_Log(2, "fail evt ,revEvt:" + revEvt);
-                        return false;
-                    }
-
-                } else {
-                    write2_MainUI_Log(2, "fail tx ,cmd:" + writeSubStrCmd[0]);
-                    return false;
-                }
-
-                testitem.popCmd();
+            //check expected string is correct or not
+            if (revEvt.equals(evt)) {
+                write2_MainUI_Log(0, "OK evt ,revEvt:" + revEvt);
+            } else {
+                write2_MainUI_Log(2, "fail evt ,revEvt:" + revEvt);
+                return false;
             }
+            testitem.popCmd();
         }
 
         //=====================BLE======================
@@ -2978,25 +2690,8 @@ public class AllTestclass extends AppCompatActivity {
 
             //all external devices can connect to the BLE device
             if (testitem.getdataStr().equals("ALLPASS")) {
-                int idx = -1;
-                while (idx < 5) {
-                    idx++;
-                    if (bleServiceInstance.isConnected()) {
-                        break;
-                    }
-                    if (idx <= 2) {
-                        //if fail reconnect
-                        write2_MainUI_Log(1, "ble not connected," + "retry:" + Integer.toString(idx));
-                        bleServiceInstance.connect(curBleAddr);
-                    } else if (idx == 3) {
-                        write2_MainUI_Log(1, "reboot bluetooth" + "retry:" + Integer.toString(idx));
-                        bleServiceInstance.rebootBluetooth();
-                        bleServiceInstance.connect(curBleAddr);
-                    } else if (idx == 4) {
-                        write2_MainUI_Log(2, "retry fail ");
-                        return false;
-                    }
-                    SystemClock.sleep(5000);
+                if (!connectRetry()) {
+                    return false;
                 }
             } else {
                 //only specific device can connect, could not connect is right behavior here
@@ -3049,98 +2744,42 @@ public class AllTestclass extends AppCompatActivity {
 
         write2_MainUI_Log(0, "*****" + testitem.gettestName() + ",data is:" + testitem.getdataStr());
 
-        setDefaultBleData();
         db_List.clear();
 
-        int retryNum = 0;
-        int retryMax = 3;
-        if (commonutil.config.UART) {
-            while (testitem.cmdSize() > 0) {
-                String cmd = testitem.getCmd().split(":")[0];
-                String evt = testitem.getCmd().split(":")[1];
+        while (testitem.cmdSize() > 0) {
+            String evt = testitem.getCmd().split(":")[1];
+            String revEvt = send_uart_Cmd(testitem,  RETRYMAX);
 
-                write2_MainUI_Log(0, "cmd:" + cmd + ", evt:" + evt);
-
-                //packet length more than 32 byte use "+" , ex:A0xxx+A2xxxx
-                String writeSubStrCmd[] = {""};
-                if (cmd.contains("+")) {
-                    writeSubStrCmd = cmd.split("\\+");
-                } else {
-                    writeSubStrCmd[0] = cmd;
-                }
-
-                //----uart tx-----> BLE
-                SystemClock.sleep(500);
-                if (_ST_SUCCESS_ == ((MainActivity) mcontext).uart_tx_command(writeSubStrCmd[0])) {
-                    //if tx length over 32 byte, transmit until finish
-                    int i;
-                    for (i = 1; i < writeSubStrCmd.length; i++) {
-                        SystemClock.sleep(500);
-                        if (_ST_SUCCESS_ != ((MainActivity) mcontext).uart_tx_command(writeSubStrCmd[i])) {
-                            write2_MainUI_Log(2, "tx fail,cmd:" + writeSubStrCmd[i]);
-                            return false;
-                        }
-                    }
-
-                    //uart rx <--- BLE
-                    SystemClock.sleep(500);
-                    byte[] rev = ((MainActivity) mcontext).uart_rx();
-
-                    if (rev.length != 0) {
-                        //check if uart rx recv incorrect size
-                        if (!checkRevLen(rev, TESTMODE)) {
-                            //work around, try three times if rev length not correct
-                            if (retryNum < retryMax) {
-                                write2_MainUI_Log(1, "retry " + Integer.toString(retryNum));
-                                retryNum++;
-                                continue;
-                            } else {
-                                String errEvtStr = ((MainActivity) mcontext).bytes2String(rev);
-                                write2_MainUI_Log(2, "retry fail errEvtStr:" + errEvtStr);
-                                return false;
-                            }
-                        }
-                    } else {
-                        write2_MainUI_Log(2, "rev length is 0");
-                    }
-
-                    //check expected string is correct or not
-                    String revEvt = ((MainActivity) mcontext).bytes2String(rev);
-                    if (revEvt.equals(evt)) {
-                        write2_MainUI_Log(0, "OK evt ,revEvt:" + revEvt);
-                    } else {
-                        write2_MainUI_Log(2, "fail evt ,revEvt:" + revEvt);
-                        return false;
-                    }
-
-                } else {
-                    write2_MainUI_Log(2, "fail tx ,cmd:" + writeSubStrCmd[0]);
-                    return false;
-                }
-
-                //3 mean first cmd set has finished, then calculate power
-                //1 mean second cmd set has finished, then calculate power
-                if (testitem.cmdSize() == 3 || testitem.cmdSize() == 1) {
-                    //=====================BLE======================
-                    if (commonutil.config.BLE) {
-
-                        long scanTime = 5000;
-                        //start scan
-                        scanLeDevice(true);
-                        //wait finish
-                        SystemClock.sleep(scanTime);
-                        //stop scan
-                        scanLeDevice(false);
-                        //add to list for comparing
-                        db_List.add(getAvgRssi());
-                        clearRssiList();
-
-                        SystemClock.sleep(500);
-                    }
-                }
-
-                testitem.popCmd();
+            //check expected string is correct or not
+            if (revEvt.equals(evt)) {
+                write2_MainUI_Log(0, "OK evt ,revEvt:" + revEvt);
+            } else {
+                write2_MainUI_Log(2, "fail evt ,revEvt:" + revEvt);
+                return false;
             }
+
+            //3 mean first cmd set has finished, then calculate power
+            //1 mean second cmd set has finished, then calculate power
+            if (testitem.cmdSize() == 3 || testitem.cmdSize() == 1) {
+                //=====================BLE======================
+                if (commonutil.config.BLE) {
+
+                    long scanTime = 5000;
+                    //start scan
+                    scanLeDevice(true);
+                    //wait finish
+                    SystemClock.sleep(scanTime);
+                    //stop scan
+                    scanLeDevice(false);
+                    //add to list for comparing
+                    db_List.add(getAvgRssi());
+                    clearRssiList();
+
+                    SystemClock.sleep(500);
+                }
+            }
+
+            testitem.popCmd();
         }
 
         //compare two power level
@@ -3176,6 +2815,8 @@ public class AllTestclass extends AppCompatActivity {
         bleServiceInstance.disconnect();
         SystemClock.sleep(3000);
 
+        clearRxbuffer();
+
         return 0;
     }
 
@@ -3203,7 +2844,6 @@ public class AllTestclass extends AppCompatActivity {
                 }
             }
 
-
             //notify
             bleServiceInstance.setCharacteristicNotify(SERVICE_UUID, NOTIFY_CHARA_UUID, WRITE_DESCRIPTOR_UUID);
 
@@ -3212,91 +2852,25 @@ public class AllTestclass extends AppCompatActivity {
             clearRxbuffer();
         }
 
-        int retryNum = 0;
-        int retryMax = 3;
-        if (commonutil.config.UART) {
-            while (testitem.cmdSize() > 0) {
+        while (testitem.cmdSize() > 0) {
+            //clear
+            bleServiceInstance.clearCharReadstr();
 
-                //clear
-                bleServiceInstance.clearCharReadstr();
+            String revEvt = send_uart_Cmd(testitem,  RETRYMAX);
 
-                String cmd = testitem.getCmd().split(":")[0];
-                String evt = testitem.getCmd().split(":")[1];
+            bleServiceInstance.readCharacteristic2(BATTERY_SERVICE_UUID, BATTERY_LEVEL_CHARA_UUID);
+            SystemClock.sleep(1000);
 
-                write2_MainUI_Log(0, "cmd:" + cmd + ", evt:" + evt);
-
-                //packet length more than 32 byte use "+" , ex:A0xxx+A2xxxx
-                String writeSubStrCmd[] = {""};
-                if (cmd.contains("+")) {
-                    writeSubStrCmd = cmd.split("\\+");
-                } else {
-                    writeSubStrCmd[0] = cmd;
-                }
-
-
-                //----uart tx-----> BLE
-                SystemClock.sleep(500);
-                if (_ST_SUCCESS_ == ((MainActivity) mcontext).uart_tx_command(writeSubStrCmd[0])) {
-                    //if tx length over 32 byte, transmit until finish
-                    int i;
-                    for (i = 1; i < writeSubStrCmd.length; i++) {
-                        SystemClock.sleep(500);
-                        if (_ST_SUCCESS_ != ((MainActivity) mcontext).uart_tx_command(writeSubStrCmd[i])) {
-                            write2_MainUI_Log(2, "tx fail,cmd:" + writeSubStrCmd[i]);
-                            return false;
-                        }
-                    }
-
-                    //uart rx <--- BLE
-                    SystemClock.sleep(500);
-                    byte[] rev = ((MainActivity) mcontext).uart_rx();
-
-                    if (rev.length != 0) {
-                        //check if uart rx recv incorrect size
-                        if (!checkRevLen(rev, TESTMODE)) {
-                            //work around, try three times if rev length not correct
-                            if (retryNum < retryMax) {
-                                write2_MainUI_Log(1, "retry " + Integer.toString(retryNum));
-                                retryNum++;
-                                continue;
-                            } else {
-                                String errEvtStr = ((MainActivity) mcontext).bytes2String(rev);
-                                write2_MainUI_Log(2, "retry fail errEvtStr:" + errEvtStr);
-                                return false;
-                            }
-                        }
-                    } else {
-                        write2_MainUI_Log(2, "rev length is 0");
-                    }
-
-                    //check expected string is correct or not
-                    String revEvt = ((MainActivity) mcontext).bytes2String(rev);
-                    if (revEvt.equals(evt)) {
-                        write2_MainUI_Log(0, "OK evt ,revEvt:" + revEvt);
-                    } else {
-                        write2_MainUI_Log(2, "fail evt ,revEvt:" + revEvt);
-                        return false;
-                    }
-
-                } else {
-                    write2_MainUI_Log(2, "fail tx ,cmd:" + writeSubStrCmd[0]);
-                    return false;
-                }
-
-                //=====================BLE======================
-                bleServiceInstance.readCharacteristic2(BATTERY_SERVICE_UUID, BATTERY_LEVEL_CHARA_UUID);
-                SystemClock.sleep(1000);
-
-                String revCharReadStr = bleServiceInstance.getCharReadstr();
-                if (battery_data.equals(revCharReadStr)) {
-                    write2_MainUI_Log(0, "OK evt ,revEvt:" + revCharReadStr);
-                } else {
-                    write2_MainUI_Log(2, "fail evt ,revEvt:" + revCharReadStr);
-                    return false;
-                }
-
-                testitem.popCmd();
+            //check expected string is correct or not
+            String revCharReadStr = bleServiceInstance.getCharReadstr();
+            if (battery_data.equals(revCharReadStr)) {
+                write2_MainUI_Log(0, "OK evt ,revEvt:" + revCharReadStr);
+            } else {
+                write2_MainUI_Log(2, "fail evt ,revEvt:" + revCharReadStr);
+                return false;
             }
+
+            testitem.popCmd();
         }
 
         return true;
@@ -3354,84 +2928,23 @@ public class AllTestclass extends AppCompatActivity {
             }
         }
 
+        //clear connection evt if exist
+        clearRxbuffer();
         //=====================UART======================
+        while (testitem.cmdSize() > 0) {
+            String evt = testitem.getCmd().split(":")[1];
+            String revEvt = send_uart_Cmd(testitem, RETRYMAX, 5000);
 
-        int retryNum = 0;
-        int retryMax = 3;
-        if (commonutil.config.UART) {
-            //clear connection evt if exist
-            clearRxbuffer();
-            while (testitem.cmdSize() > 0) {
-                String cmd = testitem.getCmd().split(":")[0];
-                String evt = testitem.getCmd().split(":")[1];
-
-
-                write2_MainUI_Log(0, "cmd:" + cmd + ", evt:" + evt);
-                //packet length more than 32 byte use "+" , ex:A0xxx+A2xxxx
-                String writeSubStrCmd[] = {""};
-                if (cmd.contains("+")) {
-                    writeSubStrCmd = cmd.split("\\+");
-                } else {
-                    writeSubStrCmd[0] = cmd;
-                }
-
-                //----uart tx-----> BLE
-                SystemClock.sleep(500);
-                if (_ST_SUCCESS_ == ((MainActivity) mcontext).uart_tx_command(writeSubStrCmd[0])) {
-                    //if tx length over 32 byte, transmit until finish
-                    int i;
-                    for (i = 1; i < writeSubStrCmd.length; i++) {
-                        SystemClock.sleep(500);
-                        if (_ST_SUCCESS_ != ((MainActivity) mcontext).uart_tx_command(writeSubStrCmd[i])) {
-                            write2_MainUI_Log(2, "tx fail,cmd:" + writeSubStrCmd[i]);
-                            return false;
-                        }
-                    }
-
-                    //uart rx <--- BLE
-                    //sleep longer to make sure interval really change
-                    SystemClock.sleep(5000);
-                    byte[] rev = ((MainActivity) mcontext).uart_rx();
-
-                    if (rev.length != 0) {
-                        //check if uart rx recv incorrect size
-                        if (!checkRevLen(rev, TESTMODE)) {
-                            //work around, try three times if rev length not correct
-                            if (retryNum < retryMax) {
-                                write2_MainUI_Log(1, "retry " + Integer.toString(retryNum) + ", wrong rev:" + commonutil.bytes2String(rev));
-                                //sleep longer to make sure interval really change
-                                SystemClock.sleep(5000);
-                                retryNum++;
-                                continue;
-                            } else {
-                                String errEvtStr = ((MainActivity) mcontext).bytes2String(rev);
-                                write2_MainUI_Log(2, "retry fail errEvtStr:" + errEvtStr);
-                                return false;
-                            }
-                        }
-                    } else {
-                        write2_MainUI_Log(2, "rev length is 0");
-                    }
-
-                    //check expected string is correct or not
-                    String revEvt = ((MainActivity) mcontext).bytes2String(rev);
-                    //different os may choose different interval
-                    if (revEvt.contains("213004")) {
-                        write2_MainUI_Log(0, "OK evt ,OS choose revEvt:" + revEvt);
-                    } else if (revEvt.equals(evt)) {
-                        write2_MainUI_Log(0, "OK evt ,revEvt:" + revEvt);
-                    } else {
-                        write2_MainUI_Log(2, "fail evt ,revEvt:" + revEvt);
-                        return false;
-                    }
-
-                } else {
-                    write2_MainUI_Log(2, "fail tx ,cmd:" + writeSubStrCmd[0]);
-                    return false;
-                }
-
-                testitem.popCmd();
+            //different os may choose different interval
+            if (revEvt.contains("213004")) {
+                write2_MainUI_Log(0,"OK evt ,OS choose revEvt:" + revEvt);
+            } else if (revEvt.equals(evt)) {
+                write2_MainUI_Log(0, "OK evt ,revEvt:" + revEvt);
+            } else {
+                write2_MainUI_Log(2, "fail evt ,revEvt:" + revEvt);
+                return false;
             }
+            testitem.popCmd();
         }
 
         return true;
@@ -3459,79 +2972,22 @@ public class AllTestclass extends AppCompatActivity {
 
         write2_MainUI_Log(0, "*****" + testitem.gettestName() + ",data is:" + testitem.getdataStr());
         //reset to default
-        //todo:add to related item
         setDefaultBleData();
         //set ble name from config
         setBleData(testitem.getdataStr());
 
-        int retryNum = 0;
-        int retryMax = 3;
-        if (commonutil.config.UART) {
-            while (testitem.cmdSize() > 0) {
-                String cmd = testitem.getCmd().split(":")[0];
-                String evt = testitem.getCmd().split(":")[1];
+        while (testitem.cmdSize() > 0) {
+            String evt = testitem.getCmd().split(":")[1];
+            String revEvt = send_uart_Cmd(testitem,  RETRYMAX);
 
-                write2_MainUI_Log(0, "cmd:" + cmd + ", evt:" + evt);
-
-                //packet length more than 32 byte use "+" , ex:A0xxx+A2xxxx
-                String writeSubStrCmd[] = {""};
-                if (cmd.contains("+")) {
-                    writeSubStrCmd = cmd.split("\\+");
-                } else {
-                    writeSubStrCmd[0] = cmd;
-                }
-
-                //----uart tx-----> BLE
-                SystemClock.sleep(500);
-                if (_ST_SUCCESS_ == ((MainActivity) mcontext).uart_tx_command(writeSubStrCmd[0])) {
-                    //if tx length over 32 byte, transmit until finish
-                    int i;
-                    for (i = 1; i < writeSubStrCmd.length; i++) {
-                        SystemClock.sleep(500);
-                        if (_ST_SUCCESS_ != ((MainActivity) mcontext).uart_tx_command(writeSubStrCmd[i])) {
-                            write2_MainUI_Log(2, "tx fail,cmd:" + writeSubStrCmd[i]);
-                            return false;
-                        }
-                    }
-
-                    //uart rx <--- BLE
-                    SystemClock.sleep(500);
-                    byte[] rev = ((MainActivity) mcontext).uart_rx();
-
-                    if (rev.length != 0) {
-                        //check if uart rx recv incorrect size
-                        if (!checkRevLen(rev, TESTMODE)) {
-                            //work around, try three times if rev length not correct
-                            if (retryNum < retryMax) {
-                                write2_MainUI_Log(1, "retry " + Integer.toString(retryNum));
-                                retryNum++;
-                                continue;
-                            } else {
-                                String errEvtStr = ((MainActivity) mcontext).bytes2String(rev);
-                                write2_MainUI_Log(2, "retry fail errEvtStr:" + errEvtStr);
-                                return false;
-                            }
-                        }
-                    } else {
-                        write2_MainUI_Log(2, "rev length is 0");
-                    }
-
-                    //check expected string is correct or not
-                    String revEvt = ((MainActivity) mcontext).bytes2String(rev);
-                    if (revEvt.equals(evt)) {
-                        write2_MainUI_Log(0, "OK evt ,revEvt:" + revEvt);
-                    } else {
-                        write2_MainUI_Log(2, "fail evt ,revEvt:" + revEvt);
-                        return false;
-                    }
-
-                } else {
-                    write2_MainUI_Log(2, "fail tx ,cmd:" + writeSubStrCmd[0]);
-                    return false;
-                }
-
-                testitem.popCmd();
+            //check expected string is correct or not
+            if (revEvt.equals(evt)) {
+                write2_MainUI_Log(0, "OK evt ,revEvt:" + revEvt);
+            } else {
+                write2_MainUI_Log(2, "fail evt ,revEvt:" + revEvt);
+                return false;
             }
+            testitem.popCmd();
         }
 
         //=====================BLE======================
@@ -3630,41 +3086,17 @@ public class AllTestclass extends AppCompatActivity {
                 SystemClock.sleep(3000);
             }
 
-            //connect
-            if (!bleServiceInstance.connect(curBleAddr)) {
-                write2_MainUI_Log(2, "connect fail");
-                return false;
-            }
-
-            //wait for connection
-            SystemClock.sleep(5000);
-
-            int idx = -1;
-            while (idx < 5) {
-                idx++;
-                if (bleServiceInstance.isConnected()) {
-                    break;
-                }
-                if (idx <= 2) {
-                    //if fail reconnect
-                    write2_MainUI_Log(1, "ble not connected," + "retry:" + Integer.toString(idx));
-                    bleServiceInstance.connect(curBleAddr);
-                } else if (idx == 3) {
-                    write2_MainUI_Log(1, "reboot bluetooth" + "retry:" + Integer.toString(idx));
-                    bleServiceInstance.rebootBluetooth();
-                    bleServiceInstance.connect(curBleAddr);
-                } else if (idx == 4) {
-                    write2_MainUI_Log(2, "retry fail ");
+            //check connect or not, retry connect 3 times if connection fail
+            if (!bleServiceInstance.isConnected()) {
+                if (!connectRetry()) {
                     return false;
                 }
-                SystemClock.sleep(5000);
             }
         }
 
         //=====================UART======================
         //clear connection event
         clearRxbuffer();
-
 
         if (commonutil.config.UART) {
             while (testitem.cmdSize() > 0) {
@@ -3681,7 +3113,6 @@ public class AllTestclass extends AppCompatActivity {
                     writeSubStrCmd[0] = cmd;
                 }
 
-
                 //----uart tx-----> BLE
                 SystemClock.sleep(500);
                 if (_ST_SUCCESS_ == ((MainActivity) mcontext).uart_tx_command(writeSubStrCmd[0])) {
@@ -3694,7 +3125,6 @@ public class AllTestclass extends AppCompatActivity {
                             return false;
                         }
                     }
-
                     //uart rx <--- BLE
                     //TODO:check
                     //wait 1 sec for android disconnection event, 500ms may too short ?
@@ -3714,12 +3144,10 @@ public class AllTestclass extends AppCompatActivity {
                     if ((revEvt.contains("265F00") && revEvt.contains("26FF10")) ||
                             (revEvt.contains("5F00") && revEvt.contains("26FF10"))) {
                         write2_MainUI_Log(0, "OK evt ,revEvt:" + revEvt);
-
                     } else {
                         write2_MainUI_Log(2, "fail evt ,revEvt:" + revEvt);
                         return false;
                     }
-
                 } else {
                     write2_MainUI_Log(2, "fail tx ,cmd:" + writeSubStrCmd[0]);
                     return false;
@@ -3768,10 +3196,7 @@ public class AllTestclass extends AppCompatActivity {
             }
         }
 
-        //clear event in buffer
-        if (commonutil.config.UART) {
-            clearRxbuffer();
-        }
+        clearRxbuffer();
 
         return 0;
     }
@@ -3779,8 +3204,6 @@ public class AllTestclass extends AppCompatActivity {
     public boolean test_DataPayload2(BLE_testItem testitem) {
         write2_MainUI_Log(0, "*****" + testitem.gettestName() + ",data is:" + testitem.getdataStr());
 
-        //reset to default
-        setDefaultBleData();
         //=====================BLE======================
         if (commonutil.config.BLE) {
             bleServiceInstance = ((MainActivity) mcontext).getBleServiceInstance();
@@ -3801,78 +3224,23 @@ public class AllTestclass extends AppCompatActivity {
         //=====================UART=====================
         //clear connection event
         clearRxbuffer();
-        int retryNum = 0;
-        int retryMax = 3;
 
-        if (commonutil.config.UART) {
-            while (testitem.cmdSize() > 0) {
+        //clear and incase of retry
+        bleServiceInstance.clearCharChagedstr();
 
-                //clear and incase of retry
-                bleServiceInstance.clearCharChagedstr();
+        //todo:handel retry
+        while (testitem.cmdSize() > 0) {
+            String evt = testitem.getCmd().split(":")[1];
+            String revEvt = send_uart_Cmd(testitem,  RETRYMAX);
 
-                String cmd = testitem.getCmd().split(":")[0];
-                String evt = testitem.getCmd().split(":")[1];
-
-                //packet length more than 32 byte use "+" , ex:A0xxx+A2xxxx
-
-                write2_MainUI_Log(0, "cmd:" + cmd + ", evt:" + evt);
-                String writeSubStrCmd[] = {""};
-                if (cmd.contains("+")) {
-                    writeSubStrCmd = cmd.split("\\+");
-                } else {
-                    writeSubStrCmd[0] = cmd;
-                }
-
-                //----uart tx-----> BLE
-                SystemClock.sleep(500);
-                if (_ST_SUCCESS_ == ((MainActivity) mcontext).uart_tx_command(writeSubStrCmd[0])) {
-                    //if tx length over 32 byte, transmit until finish
-                    int i;
-                    for (i = 1; i < writeSubStrCmd.length; i++) {
-                        SystemClock.sleep(500);
-                        if (_ST_SUCCESS_ != ((MainActivity) mcontext).uart_tx_command(writeSubStrCmd[i])) {
-                            write2_MainUI_Log(2, "tx fail,cmd:" + writeSubStrCmd[i]);
-                            return false;
-                        }
-                    }
-
-                    //uart rx <--- BLE
-                    SystemClock.sleep(500);
-                    byte[] rev = ((MainActivity) mcontext).uart_rx();
-
-                    if (rev.length != 0) {
-                        //check if uart rx recv incorrect size
-                        if (!checkRevLen(rev, TESTMODE)) {
-                            //work around, try three times if rev length not correct
-                            if (retryNum < retryMax) {
-                                write2_MainUI_Log(1,"retry " + Integer.toString(retryNum));
-                                retryNum++;
-                                continue;
-                            } else {
-                                String errEvtStr = ((MainActivity) mcontext).bytes2String(rev);
-                                write2_MainUI_Log(2, "retry fail errEvtStr:" + errEvtStr);
-                                return false;
-                            }
-                        }
-                    } else {
-                        write2_MainUI_Log(2, "rev length is 0");
-                    }
-
-                    //check expected string is correct or not
-                    String revEvt = ((MainActivity) mcontext).bytes2String(rev);
-                    if (revEvt.equals(evt)) {
-                        write2_MainUI_Log(0, "OK evt ,revEvt:" + revEvt);
-                    } else {
-                        write2_MainUI_Log(2, "fail evt ,revEvt:" + revEvt);
-                        return false;
-                    }
-                } else {
-                    write2_MainUI_Log(2, "fail tx ,cmd:" + writeSubStrCmd[0]);
-                    return false;
-                }
-
-                testitem.popCmd();
+            //check expected string is correct or not
+            if (revEvt.equals(evt)) {
+                write2_MainUI_Log(0, "OK evt ,revEvt:" + revEvt);
+            } else {
+                write2_MainUI_Log(2, "fail evt ,revEvt:" + revEvt);
+                return false;
             }
+            testitem.popCmd();
         }
 
         //=====================check data=====================
@@ -3912,93 +3280,62 @@ public class AllTestclass extends AppCompatActivity {
 
         write2_MainUI_Log(0, "*****" + testitem.gettestName() + ",data is:" + testitem.getdataStr());
 
-        int retryNum = 0;
-        int retryMax = 3;
-        if (commonutil.config.UART) {
-            while (testitem.cmdSize() > 0) {
-                String cmd = testitem.getCmd().split(":")[0];
-                String evt = testitem.getCmd().split(":")[1];
+        while (testitem.cmdSize() > 0) {
+            String evt = testitem.getCmd().split(":")[1];
+            String revEvt = send_uart_Cmd(testitem, RETRYMAX);
 
-                write2_MainUI_Log(0, "cmd:" + cmd + ", evt:" + evt);
+            write2_MainUI_Log(0, "revEvt:" + revEvt);
 
-                //packet length more than 32 byte use "+" , ex:A0xxx+A2xxxx
-                String writeSubStrCmd[] = {""};
-                if (cmd.contains("+")) {
-                    writeSubStrCmd = cmd.split("\\+");
-                } else {
-                    writeSubStrCmd[0] = cmd;
-                }
+            //read phy addr start with 0x57
+            if (revEvt.startsWith("6C57") || revEvt.startsWith("57")) {
+                if (checkSubstrOfReadPhy(revEvt, evt, TESTMODE)) {
+                    String strsubaddr = GetReadPhyAddr(revEvt, TESTMODE);
+                    String strsubdata = GetReadPhyData(revEvt, TESTMODE);
+                    write2_MainUI_Log(0, "addr:" + strsubaddr + ",data:" + strsubdata);
 
-
-                //----uart tx-----> BLE
-                SystemClock.sleep(500);
-                if (_ST_SUCCESS_ == ((MainActivity) mcontext).uart_tx_command(writeSubStrCmd[0])) {
-                    //if tx length over 32 byte, transmit until finish
-                    int i;
-                    for (i = 1; i < writeSubStrCmd.length; i++) {
-                        SystemClock.sleep(500);
-                        if (_ST_SUCCESS_ != ((MainActivity) mcontext).uart_tx_command(writeSubStrCmd[i])) {
-                            write2_MainUI_Log(2, "tx fail,cmd:" + writeSubStrCmd[i]);
+                    if (strsubaddr.equals(PHY_FUNC_ADDR)) {
+                        if (!checkFunctioDatanbit(strsubdata)) {
+                            write2_MainUI_Log(2, "fail Function revEvt:" + strsubaddr);
                             return false;
                         }
                     }
-
-                    //uart rx <--- BLE
-                    SystemClock.sleep(500);
-                    byte[] rev = ((MainActivity) mcontext).uart_rx();
-
-                    if (rev.length != 0) {
-                        //check if uart rx recv incorrect size
-                        if (!checkRevLen(rev, TESTMODE)) {
-                            //work around, try three times if rev length not correct
-                            if (retryNum < retryMax) {
-                                write2_MainUI_Log(1, "retry " + Integer.toString(retryNum));
-                                retryNum++;
-                                continue;
-                            } else {
-                                String errEvtStr = ((MainActivity) mcontext).bytes2String(rev);
-                                write2_MainUI_Log(2, "retry fail errEvtStr:" + errEvtStr);
-                                return false;
-                            }
-                        }
-                    } else {
-                        write2_MainUI_Log(2, "rev length is 0");
-                    }
-
-                    //check expected string is correct or not
-                    String revEvt = ((MainActivity) mcontext).bytes2String(rev);
-                    write2_MainUI_Log(0, "revEvt:" + revEvt);
-
-                    //read phy addr start with 0x57
-                    if (revEvt.startsWith("6C57") || revEvt.startsWith("57")) {
-                        if (checkSubstrOfReadPhy(revEvt, evt, TESTMODE)) {
-                            String strsubaddr = GetReadPhyAddr(revEvt, TESTMODE);
-                            String strsubdata = GetReadPhyData(revEvt, TESTMODE);
-                            write2_MainUI_Log(0,"addr:" + strsubaddr + ",data:" + strsubdata);
-
-                            if (strsubaddr.equals(PHY_FUNC_ADDR)) {
-                                if (!checkFunctioDatanbit(strsubdata)) {
-                                    write2_MainUI_Log(2,"fail Function revEvt:" + strsubaddr);
-                                    return false;
-                                }
-                            }
-                        }
-                    } else if (evt.equals("FF")) {
-                        // note: it is evt not revEvt,just for passing to next cmd
-                        commonutil.wdbgLogcat(TAG, 0, "FF pass");
-                    } else {
-                        write2_MainUI_Log(2, "fail evt ,revEvt:" + revEvt);
-                        return false;
-                    }
-                } else {
-                    write2_MainUI_Log(2, "fail tx ,cmd:" + writeSubStrCmd[0]);
-                    return false;
                 }
-
-                testitem.popCmd();
+            } else if (evt.equals("FF")) {
+                // note: it is evt not revEvt,just for passing to next cmd
+                commonutil.wdbgLogcat(TAG, 0, "FF pass");
+            } else {
+                write2_MainUI_Log(2, "fail evt ,revEvt:" + revEvt);
+                return false;
             }
+
+            testitem.popCmd();
         }
+
         return true;
+    }
+
+    public int BD_changeBaudRate(BLE_testItem testItem) {
+        //TODO:open if 7611 has this feature
+        if (((MainActivity) mcontext).GetTestMode() == SPI_MODE) {
+            write2_MainUI_Log(0, "7611 not support changeBaudRate yet");
+            //7611 can't modify baud rate, so skip
+            return 0;
+        }
+
+        Current_TEST_NAME = BD_TEST_CHANGE_BAUDRATE;
+
+        write2_MainUI_Log(0, "S=====" + testItem.gettestName());
+        setupBRList();
+        if (!test_changeBaudRate()) {
+            write2_MainUI_Log(2, Current_TEST_NAME + " test fail");
+            ((MainActivity) mcontext).updateFailCnt();
+        } else {
+            write2_MainUI_Log(0, Current_TEST_NAME + " test success");
+            ((MainActivity) mcontext).updatesuccesstv();
+        }
+
+        write2_MainUI_Log(0, "E=====" + testItem.gettestName());
+        return 0;
     }
 
     //air
@@ -5052,7 +4389,7 @@ public class AllTestclass extends AppCompatActivity {
                 }
             } else if (evt.equals("FF")) {
                 // note: it is evt not revEvt,just for passing to next cmd
-                commonutil.wdbgLogcat(TAG, 0, "FF pass, write phy has no event");
+                write2_MainUI_Log(0, "FF pass, write phy has no event");
             } else {
                 write2_MainUI_Log(2, "fail evt ,revEvt:" + revEvt);
                 return false;
@@ -5062,6 +4399,8 @@ public class AllTestclass extends AppCompatActivity {
         }
         return true;
     }
+
+
 
     private void parseAdv(byte[] adv_data) {
         if (adv_data.length == 0) {
@@ -5530,5 +4869,138 @@ public class AllTestclass extends AppCompatActivity {
         Log.d(TAG, "cmd" + testItem.getCmd());
         testItem.popCmd();
         Log.d(TAG, "cmd:" + testItem.getCmd());
+    }
+
+    String send_uart_Cmd(BLE_testItem testitem, final int retryMax) {
+
+        byte[] rev = {};
+        boolean flag = false;
+        int current_retryNum = 0;
+        while (!flag) {
+            String cmd = testitem.getCmd().split(":")[0];
+            String evt = testitem.getCmd().split(":")[1];
+
+            write2_MainUI_Log(0, "cmd:" + cmd + ", evt:" + evt);
+
+            //packet length more than 32 byte use "+" , ex:A0xxx+A2xxxx
+            String writeSubStrCmd[] = {""};
+            if (cmd.contains("+")) {
+                writeSubStrCmd = cmd.split("\\+");
+            } else {
+                writeSubStrCmd[0] = cmd;
+            }
+
+            //----uart tx-----> BLE
+            SystemClock.sleep(500);
+
+            if (_ST_SUCCESS_ == ((MainActivity) mcontext).uart_tx_command(writeSubStrCmd[0])) {
+                //if tx length over 32 byte, transmit until finish
+                int i;
+                for (i = 1; i < writeSubStrCmd.length; i++) {
+                    SystemClock.sleep(500);
+                    if (_ST_SUCCESS_ != ((MainActivity) mcontext).uart_tx_command(writeSubStrCmd[i])) {
+                        write2_MainUI_Log(2, "tx fail,cmd:" + writeSubStrCmd[i]);
+                        return FAIL;
+                    }
+                }
+
+                //uart rx <--- BLE
+                SystemClock.sleep(500);
+                rev = ((MainActivity) mcontext).uart_rx();
+
+                if (rev.length != 0) {
+                    //check if uart rx recv incorrect size
+                    if (!checkRevLen(rev, TESTMODE)) {
+                        //work around, try three times if rev length not correct
+                        if (current_retryNum < retryMax) {
+                            write2_MainUI_Log(1, "retry " + Integer.toString(current_retryNum));
+                            current_retryNum++;
+                        } else {
+                            String errEvtStr = ((MainActivity) mcontext).bytes2String(rev);
+                            write2_MainUI_Log(2, "retry fail errEvtStr:" + errEvtStr);
+                            return FAIL;
+                        }
+                    }
+                    else
+                    {
+                        //success
+                        flag = true;
+                    }
+                } else {
+                    write2_MainUI_Log(2, "rev length is 0");
+                    return FAIL;
+                }
+            } else {
+                write2_MainUI_Log(2, "fail tx ,cmd:" + writeSubStrCmd[0]);
+                return FAIL;
+            }
+        }//end while
+
+        return ((MainActivity) mcontext).bytes2String(rev);
+    }
+
+    String send_uart_Cmd(BLE_testItem testitem, final int retryMax,long wait_rx_time_ms) {
+        byte[] rev = {};
+        boolean flag = false;
+        int current_retryNum = 0;
+        while (!flag) {
+            String cmd = testitem.getCmd().split(":")[0];
+            String evt = testitem.getCmd().split(":")[1];
+
+            write2_MainUI_Log(0, "cmd:" + cmd + ", evt:" + evt);
+
+            //packet length more than 32 byte use "+" , ex:A0xxx+A2xxxx
+            String writeSubStrCmd[] = {""};
+            if (cmd.contains("+")) {
+                writeSubStrCmd = cmd.split("\\+");
+            } else {
+                writeSubStrCmd[0] = cmd;
+            }
+
+            //----uart tx-----> BLE
+            SystemClock.sleep(500);
+
+            if (_ST_SUCCESS_ == ((MainActivity) mcontext).uart_tx_command(writeSubStrCmd[0])) {
+                //if tx length over 32 byte, transmit until finish
+                int i;
+                for (i = 1; i < writeSubStrCmd.length; i++) {
+                    SystemClock.sleep(500);
+                    if (_ST_SUCCESS_ != ((MainActivity) mcontext).uart_tx_command(writeSubStrCmd[i])) {
+                        write2_MainUI_Log(2, "tx fail,cmd:" + writeSubStrCmd[i]);
+                        return FAIL;
+                    }
+                }
+
+                //uart rx <--- BLE
+                SystemClock.sleep(wait_rx_time_ms);
+                rev = ((MainActivity) mcontext).uart_rx();
+
+                if (rev.length != 0) {
+                    //check if uart rx recv incorrect size
+                    if (!checkRevLen(rev, TESTMODE)) {
+                        //work around, try three times if rev length not correct
+                        if (current_retryNum < retryMax) {
+                            write2_MainUI_Log(1, "retry " + Integer.toString(current_retryNum));
+                            current_retryNum++;
+                        } else {
+                            String errEvtStr = ((MainActivity) mcontext).bytes2String(rev);
+                            write2_MainUI_Log(2, "retry fail errEvtStr:" + errEvtStr);
+                            return FAIL;
+                        }
+                    } else {
+                        //success
+                        flag = true;
+                    }
+                } else {
+                    write2_MainUI_Log(2, "rev length is 0");
+                    return FAIL;
+                }
+            } else {
+                write2_MainUI_Log(2, "fail tx ,cmd:" + writeSubStrCmd[0]);
+                return FAIL;
+            }
+        }//end while
+
+        return ((MainActivity) mcontext).bytes2String(rev);
     }
 }
