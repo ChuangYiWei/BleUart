@@ -646,7 +646,7 @@ public class MainActivity extends AppCompatActivity {
                 Log.d(TAG, "run on ui thread");
             }
             try {//TODO
-                for (int i = 0; i < 1 && isThreadRunning() ;i++) {
+                for (int i = 0; i < 1 && isThreadRunning() ;) {
                     Log.w(TAG, "invokeAllTest:" + Integer.toString(i));
                     //invokeTest();
                     invokeTest2();
@@ -692,6 +692,7 @@ public class MainActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
             }
+            list.clear();
             commonutil.wdbgLogcat(TAG, 0,"one round done");
         } catch (Throwable e) {
             e.printStackTrace();

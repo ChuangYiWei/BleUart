@@ -377,9 +377,21 @@ public class bleService extends Service {
         UUID chara_uuid = UUID.fromString(characteristicUUID);
         UUID desc_uuid = UUID.fromString(descriptorUUID);
         BluetoothGattService service = mBluetoothGatt.getService(service_uuid);
+        if(service == null)
+        {
+            commonutil.wdbgLogcat(TAG, 2, "service is null");
+            return;
+        }
         BluetoothGattCharacteristic chara = service.getCharacteristic(chara_uuid);
+        if(chara == null)
+        {
+            commonutil.wdbgLogcat(TAG, 2, "BluetoothGattCharacteristic is null");
+            return;
+        }
+
         if (!mBluetoothGatt.setCharacteristicNotification(chara, true)) {
-            commonutil.wdbgLogcat(TAG, 2, "setCharacteristicNotification null");
+            commonutil.wdbgLogcat(TAG, 2, "setCharacteristicNotification fail");
+            return;
         }
         BluetoothGattDescriptor descriptor = chara.getDescriptor(desc_uuid);
 

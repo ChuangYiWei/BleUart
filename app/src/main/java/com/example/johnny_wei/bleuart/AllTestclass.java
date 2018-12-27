@@ -3228,10 +3228,9 @@ public class AllTestclass extends AppCompatActivity {
         //clear and incase of retry
         bleServiceInstance.clearCharChagedstr();
 
-        //todo:handel retry
         while (testitem.cmdSize() > 0) {
             String evt = testitem.getCmd().split(":")[1];
-            String revEvt = send_uart_Cmd(testitem,  RETRYMAX);
+            String revEvt = send_uart_Cmd(testitem, RETRYMAX);
 
             //check expected string is correct or not
             if (revEvt.equals(evt)) {
@@ -3299,6 +3298,8 @@ public class AllTestclass extends AppCompatActivity {
                             return false;
                         }
                     }
+                } else {
+                    return false;
                 }
             } else if (evt.equals("FF")) {
                 // note: it is evt not revEvt,just for passing to next cmd
@@ -4386,6 +4387,8 @@ public class AllTestclass extends AppCompatActivity {
                             return false;
                         }
                     }
+                } else {
+                    return false;
                 }
             } else if (evt.equals("FF")) {
                 // note: it is evt not revEvt,just for passing to next cmd
@@ -4547,6 +4550,8 @@ public class AllTestclass extends AppCompatActivity {
         String revSubaddr = null;
         String expStrsub1 = null;
         String expSubaddr = null;
+        mode = ((MainActivity) mcontext).GetTestMode();
+
         switch (mode) {
             case SPI_MODE:
                 // only compare first 6 byte and addr, we don't know data content
@@ -4871,6 +4876,16 @@ public class AllTestclass extends AppCompatActivity {
         Log.d(TAG, "cmd:" + testItem.getCmd());
     }
 
+    //for special handle
+    void uartRetryTrigger()
+    {
+        if(Current_TEST_NAME == BD_TEST_DATA_PAYLOAD_WRITE)
+        {
+            //clear and incase of retry
+            bleServiceInstance.clearCharChagedstr();
+        }
+    }
+
     String send_uart_Cmd(BLE_testItem testitem, final int retryMax) {
 
         byte[] rev = {};
@@ -4914,6 +4929,7 @@ public class AllTestclass extends AppCompatActivity {
                         //work around, try three times if rev length not correct
                         if (current_retryNum < retryMax) {
                             write2_MainUI_Log(1, "retry " + Integer.toString(current_retryNum));
+                            uartRetryTrigger();
                             current_retryNum++;
                         } else {
                             String errEvtStr = ((MainActivity) mcontext).bytes2String(rev);
