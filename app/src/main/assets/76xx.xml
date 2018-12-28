@@ -615,27 +615,27 @@
             <cmd>2533060A8967452301:263300</cmd>
             <cmd>2033:2133060A8967452301</cmd>
         </item>
-        <!--write 6 byte addr-->
-        <item>
-            <func_name>AIR_BD_AddrWrite</func_name>
-            <data>11:22:33:44:55:66</data>
-            <cmd>253306665544332211:263300</cmd>
-            <cmd>2033:213306665544332211</cmd>
-        </item>
-        <!--[write 7 byte over than 6 byte] 只會抓到前六byte-->
-        <item>
-            <func_name>AIR_BD_AddrWrite</func_name>
-            <data>22:33:44:55:66:77</data>
-            <cmd>25330777665544332211:263300</cmd>
-            <cmd>2033:213306776655443322</cmd>
-        </item>
-        <!--write 6 byte addr 設定成default addr-->
-        <item>
-            <func_name>AIR_BD_AddrWrite</func_name>
-            <data>01:23:45:67:89:0A</data>
-            <cmd>2533060A8967452301:263300</cmd>
-            <cmd>2033:2133060A8967452301</cmd>
-        </item>
+        <!--&lt;!&ndash;write 6 byte addr&ndash;&gt;-->
+        <!--<item>-->
+            <!--<func_name>AIR_BD_AddrWrite</func_name>-->
+            <!--<data>11:22:33:44:55:66</data>-->
+            <!--<cmd>253306665544332211:263300</cmd>-->
+            <!--<cmd>2033:213306665544332211</cmd>-->
+        <!--</item>-->
+        <!--&lt;!&ndash;[write 7 byte over than 6 byte] 只會抓到前六byte&ndash;&gt;-->
+        <!--<item>-->
+            <!--<func_name>AIR_BD_AddrWrite</func_name>-->
+            <!--<data>22:33:44:55:66:77</data>-->
+            <!--<cmd>25330777665544332211:263300</cmd>-->
+            <!--<cmd>2033:213306776655443322</cmd>-->
+        <!--</item>-->
+        <!--&lt;!&ndash;write 6 byte addr 設定成default addr&ndash;&gt;-->
+        <!--<item>-->
+            <!--<func_name>AIR_BD_AddrWrite</func_name>-->
+            <!--<data>01:23:45:67:89:0A</data>-->
+            <!--<cmd>2533060A8967452301:263300</cmd>-->
+            <!--<cmd>2033:2133060A8967452301</cmd>-->
+        <!--</item>-->
 
         <!--++++++++++++++++++++AdvIntvWriteCmd
     Adv Interval (Unit: 1 ms, Valid Range=20~10000,LSB) , data 0 means pass-->

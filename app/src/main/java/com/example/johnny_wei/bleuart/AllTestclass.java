@@ -2319,9 +2319,8 @@ public class AllTestclass extends AppCompatActivity {
             bleServiceInstance.clearCbUnixTime();
 
             long startUnixTime = System.currentTimeMillis();
-            ;
-            bleServiceInstance.writeCharaval(SERVICE_UUID, WRITE_CHARA_UUID, bytes);
-            SystemClock.sleep(1000);
+
+            writeAirCmd(bytes);
             long endUnixTime = bleServiceInstance.GetchangeCbUnixTime();
             long diffTime = endUnixTime - startUnixTime;
             diffSum = diffSum + diffTime;
@@ -3399,8 +3398,7 @@ public class AllTestclass extends AppCompatActivity {
                 byte[] bytes = ((MainActivity) mcontext).string2Bytes(cmd);
 
                 //write command
-                bleServiceInstance.writeCharaval(SERVICE_UUID, WRITE_CHARA_UUID, bytes);
-                SystemClock.sleep(1000);
+                writeAirCmd(bytes);
 
                 //check write evt string is correct or not
                 String revEvt = bleServiceInstance.getCharChagedstr();
@@ -3494,8 +3492,7 @@ public class AllTestclass extends AppCompatActivity {
                 byte[] bytes = ((MainActivity) mcontext).string2Bytes(cmd);
 
                 //write command
-                bleServiceInstance.writeCharaval(SERVICE_UUID, WRITE_CHARA_UUID, bytes);
-                SystemClock.sleep(1000);
+                writeAirCmd(bytes);
 
                 //check write evt string is correct or not
                 String revEvt = bleServiceInstance.getCharChagedstr();
@@ -3598,10 +3595,8 @@ public class AllTestclass extends AppCompatActivity {
 
                 commonutil.wdbgLogcat(TAG, 0, "cmd:" + cmd + "evt:" + evt);
                 byte[] bytes = ((MainActivity) mcontext).string2Bytes(cmd);
+                writeAirCmd(bytes);
 
-                //write command
-                bleServiceInstance.writeCharaval(SERVICE_UUID, WRITE_CHARA_UUID, bytes);
-                SystemClock.sleep(1000);
 
                 //check write evt string is correct or not
                 String revEvt = bleServiceInstance.getCharChagedstr();
@@ -3636,6 +3631,13 @@ public class AllTestclass extends AppCompatActivity {
 
         }
         return true;
+    }
+
+    final Long timeout_chara_callback = 2000L;
+    private void writeAirCmd(byte[] bytes) {
+        //write command
+        bleServiceInstance.writeCharaval(SERVICE_UUID, WRITE_CHARA_UUID, bytes);
+        SystemClock.sleep(timeout_chara_callback);
     }
 
     public int AIR_BD_AdvDataWrite(BLE_testItem testItem) {
@@ -3704,8 +3706,7 @@ public class AllTestclass extends AppCompatActivity {
                 byte[] bytes = ((MainActivity) mcontext).string2Bytes(cmd);
 
                 //write command
-                bleServiceInstance.writeCharaval(SERVICE_UUID, WRITE_CHARA_UUID, bytes);
-                SystemClock.sleep(1000);
+                writeAirCmd(bytes);
 
                 //check write evt string is correct or not
                 String revEvt = bleServiceInstance.getCharChagedstr();
@@ -3800,8 +3801,7 @@ public class AllTestclass extends AppCompatActivity {
                 byte[] bytes = ((MainActivity) mcontext).string2Bytes(cmd);
 
                 //write command
-                bleServiceInstance.writeCharaval(SERVICE_UUID, WRITE_CHARA_UUID, bytes);
-                SystemClock.sleep(1000);
+                writeAirCmd(bytes);
 
                 //check write evt string is correct or not
                 String revEvt = bleServiceInstance.getCharChagedstr();
@@ -3908,9 +3908,7 @@ public class AllTestclass extends AppCompatActivity {
             byte[] bytes = ((MainActivity) mcontext).string2Bytes(cmd);
 
             //write command
-            bleServiceInstance.writeCharaval(SERVICE_UUID, WRITE_CHARA_UUID, bytes);
-
-            SystemClock.sleep(1000);
+            writeAirCmd(bytes);
 
             //read char value
             bleServiceInstance.readCharacteristic2(BATTERY_SERVICE_UUID, BATTERY_LEVEL_CHARA_UUID);
@@ -3989,7 +3987,7 @@ public class AllTestclass extends AppCompatActivity {
             byte[] bytes = ((MainActivity) mcontext).string2Bytes(cmd);
 
             //write command
-            bleServiceInstance.writeCharaval(SERVICE_UUID, WRITE_CHARA_UUID, bytes);
+            writeAirCmd(bytes);
             SystemClock.sleep(5000);
 
             //check write evt string is correct or not
@@ -4018,8 +4016,7 @@ public class AllTestclass extends AppCompatActivity {
             bleServiceInstance.clearCbUnixTime();
 
             long startUnixTime = System.currentTimeMillis();
-            ;
-            bleServiceInstance.writeCharaval(SERVICE_UUID, WRITE_CHARA_UUID, bytes);
+            writeAirCmd(bytes);
             SystemClock.sleep(2000);
             long endUnixTime = bleServiceInstance.GetchangeCbUnixTime();
             long diffTime = endUnixTime - startUnixTime;
@@ -4099,8 +4096,7 @@ public class AllTestclass extends AppCompatActivity {
                 byte[] bytes = ((MainActivity) mcontext).string2Bytes(cmd);
 
                 //write command
-                bleServiceInstance.writeCharaval(SERVICE_UUID, WRITE_CHARA_UUID, bytes);
-                SystemClock.sleep(1000);
+                writeAirCmd(bytes);
 
                 //check write evt string is correct or not
                 String revEvt = bleServiceInstance.getCharChagedstr();
@@ -4216,8 +4212,7 @@ public class AllTestclass extends AppCompatActivity {
                 byte[] bytes = ((MainActivity) mcontext).string2Bytes(cmd);
 
                 //write command
-                bleServiceInstance.writeCharaval(SERVICE_UUID, WRITE_CHARA_UUID, bytes);
-                SystemClock.sleep(1000);
+                writeAirCmd(bytes);
 
                 //check write evt string is correct or not, there is no need to check revEvt, check connection
                 //staus below
@@ -4298,8 +4293,7 @@ public class AllTestclass extends AppCompatActivity {
             byte[] bytes = ((MainActivity) mcontext).string2Bytes(cmd);
 
             //write command
-            bleServiceInstance.writeCharaval(SERVICE_UUID, WRITE_CHARA_UUID, bytes);
-            SystemClock.sleep(1000);
+            writeAirCmd(bytes);
 
             //check write evt string is correct or not
             String revEvt = bleServiceInstance.getCharChagedstr();
@@ -4369,8 +4363,7 @@ public class AllTestclass extends AppCompatActivity {
             byte[] bytes = ((MainActivity) mcontext).string2Bytes(cmd);
 
             //write command
-            bleServiceInstance.writeCharaval(SERVICE_UUID, WRITE_CHARA_UUID, bytes);
-            SystemClock.sleep(1000);
+            writeAirCmd(bytes);
 
             //check write evt string is correct or not
             String revEvt = bleServiceInstance.getCharChagedstr();

@@ -376,15 +376,27 @@ public class bleService extends Service {
         UUID service_uuid = UUID.fromString(serviceUUID);
         UUID chara_uuid = UUID.fromString(characteristicUUID);
         UUID desc_uuid = UUID.fromString(descriptorUUID);
-        BluetoothGattService service = mBluetoothGatt.getService(service_uuid);
-        if(service == null)
-        {
+
+        int retrymax = 3;
+        int cnt = 0;
+        BluetoothGattService service;
+        do {
+            service = mBluetoothGatt.getService(service_uuid);
+            if(service == null) {
+                commonutil.wdbgLogcat(TAG, 1, "service retry ");
+            }
+            SystemClock.sleep(200);
+            cnt++;
+        }
+        while((service == null) && (cnt < retrymax) );
+
+        if (service == null) {
             commonutil.wdbgLogcat(TAG, 2, "service is null");
             return;
         }
+
         BluetoothGattCharacteristic chara = service.getCharacteristic(chara_uuid);
-        if(chara == null)
-        {
+        if (chara == null) {
             commonutil.wdbgLogcat(TAG, 2, "BluetoothGattCharacteristic is null");
             return;
         }
@@ -467,16 +479,32 @@ public class bleService extends Service {
         UUID service_uuid = UUID.fromString(serviceUUID);
         UUID chara_uuid = UUID.fromString(characteristicUUID);
         BluetoothGattService service = mBluetoothGatt.getService(service_uuid);
-        if (service != null) {
-            BluetoothGattCharacteristic chara = service.getCharacteristic(chara_uuid);
-            chara.setValue(bytes);
-            if (!mBluetoothGatt.writeCharacteristic(chara)) {
-                commonutil.wdbgLogcat(TAG, 2, "write characteristic fail");
-                Log.e(TAG, "write characteristic fail");
+        if (service == null) { Log.e(TAG, "service null"); return;}
+
+        BluetoothGattCharacteristic chara = service.getCharacteristic(chara_uuid);
+        if (chara == null) { commonutil.wdbgLogcat(TAG, 2, "BluetoothGattCharacteristic is null"); return; }
+
+        chara.setValue(bytes);
+
+        int retrymax = 3;
+        int cnt = 0;
+        boolean writeflag;
+        do {
+            writeflag = mBluetoothGatt.writeCharacteristic(chara);
+            if (!writeflag) {
+                commonutil.wdbgLogcat(TAG, 1, "write chara not success, retry");
+            } else {
+                break;
             }
-        } else {
-            Log.e(TAG, "service null");
+            SystemClock.sleep(500);
+            cnt++;
         }
+        while ((writeflag == false) && (cnt < retrymax));
+
+        if (!writeflag) {
+            commonutil.wdbgLogcat(TAG, 2, "write characteristic fail");
+        }
+
     }
 
     public void wirteCharacteristic(BluetoothGattCharacteristic characteristic) {
