@@ -3867,8 +3867,8 @@ public class AllTestclass extends AppCompatActivity {
         }
 
         //disconnect no matter success or fail
-        bleServiceInstance.disconnect();
-        SystemClock.sleep(3000);
+//        bleServiceInstance.disconnect();
+//        SystemClock.sleep(3000);
 
         write2_MainUI_Log(0, "E=====" + testItem.gettestName());
 
@@ -3926,8 +3926,8 @@ public class AllTestclass extends AppCompatActivity {
         }
 
         //disconnect, sleep few secs for decreasing fail reconnect rate
-        bleServiceInstance.disconnect();
-        SystemClock.sleep(3000);
+//        bleServiceInstance.disconnect();
+//        SystemClock.sleep(3000);
 
         return true;
     }
@@ -3946,8 +3946,8 @@ public class AllTestclass extends AppCompatActivity {
         }
 
         //disconnect no matter success or fail
-        bleServiceInstance.disconnect();
-        SystemClock.sleep(3000);
+//        bleServiceInstance.disconnect();
+//        SystemClock.sleep(3000);
 
         write2_MainUI_Log(0, "E=====" + testItem.gettestName());
 
@@ -4252,8 +4252,8 @@ public class AllTestclass extends AppCompatActivity {
         }
 
         //disconnect no matter success or fail
-        bleServiceInstance.disconnect();
-        SystemClock.sleep(3000);
+//        bleServiceInstance.disconnect();
+//        SystemClock.sleep(3000);
 
         write2_MainUI_Log(0, "E=====" + testItem.gettestName());
 
@@ -4323,8 +4323,8 @@ public class AllTestclass extends AppCompatActivity {
         }
 
         //disconnect no matter success or fail
-        bleServiceInstance.disconnect();
-        SystemClock.sleep(3000);
+//        bleServiceInstance.disconnect();
+//        SystemClock.sleep(3000);
 
         write2_MainUI_Log(0, "E=====" + testItem.gettestName());
 

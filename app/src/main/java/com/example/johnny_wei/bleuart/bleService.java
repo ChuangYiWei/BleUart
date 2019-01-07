@@ -385,7 +385,7 @@ public class bleService extends Service {
             if(service == null) {
                 commonutil.wdbgLogcat(TAG, 1, "service retry ");
             }
-            SystemClock.sleep(200);
+            SystemClock.sleep(500);
             cnt++;
         }
         while((service == null) && (cnt < retrymax) );
