@@ -218,16 +218,17 @@ public class bleService extends Service {
         if(!mBluetoothAdapter.disable()) {
             commonutil.wdbgLogcat(TAG, 2, "disable bluetooth fail");
         }
-        SystemClock.sleep(2000);
+        SystemClock.sleep(5000);
         if(!mBluetoothAdapter.enable()) {
             commonutil.wdbgLogcat(TAG, 2, "enable bluetooth fail");
         }
-        SystemClock.sleep(2000);
+        SystemClock.sleep(5000);
         return true;
     }
 
     static final int GATT_CONN_TERMINATE_LOCAL_HOST = 0x16;
     static final int GATT_CONN_TIMEOUT = 0x08;
+    static final int GATT_INTERNAL_ERROR = 0x81;//129
     /*gatt callback*/
     private final BluetoothGattCallback mGattCallback = new BluetoothGattCallback() {
         @Override
@@ -261,6 +262,8 @@ public class bleService extends Service {
             commonutil.wdbgLogcat(TAG, 1, "onServicesDiscovered.");
             if (BluetoothGatt.GATT_SUCCESS == status) {
                 broadcastUpdate(ACTION_GATT_SERVICES_DISCOVERED);
+            } else if (status == GATT_INTERNAL_ERROR) {
+                commonutil.wdbgLogcat(TAG, 2, "GATT_INTERNAL_ERROR!");
             } else {
                 commonutil.wdbgLogcat(TAG, 2, "onServicesDiscovered error status : " + status);
             }
@@ -289,9 +292,10 @@ public class bleService extends Service {
         @Override
         public void onCharacteristicWrite(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
             if (BluetoothGatt.GATT_SUCCESS == status) {
+                commonutil.wdbgLogcat(TAG,0, "onCharacteristicWrite success");
                 broadcastUpdate(ACTION_GATT_CHARA_DATA_WRITE);
             } else {
-                Log.e(TAG, "onCharacteristicWrite fail");
+                commonutil.wdbgLogcat(TAG,2, "onCharacteristicWrite fail status:" + status);
             }
             super.onCharacteristicWrite(gatt, characteristic, status);
         }
