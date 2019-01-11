@@ -606,7 +606,7 @@
         </item>
     </SPI>
 
-    <AIR_CMD>
+    <AIR_UART_CMD>
         <!--3, 11++++++++++++++++++++BDAddrWriteCmd BD_Addr(6 bytes, public, LSB)-->
         <!--write 6 byte addr 設定成default addr-->
         <item>
@@ -847,6 +847,15 @@
             <data>1</data>
             <cmd>560194042000:57010000940420000400B0A0</cmd>
         </item>
-    </AIR_CMD>
+    </AIR_UART_CMD>
 
+    <AIR_HCI_CMD>
+        <!--write 1 byte 1-->
+        <item>
+            <func_name>AIR_HCI_BD_NameWrite</func_name>
+            <data>1</data>
+            <cmd>01130C0131:040E0401130C00</cmd>
+            <cmd>01140C00:040E0501140C0031</cmd>
+        </item>
+    </AIR_HCI_CMD>>
 </BC76xx>

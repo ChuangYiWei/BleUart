@@ -44,6 +44,7 @@ public class AllTestclass extends AppCompatActivity {
     final int SPI_MODE = 0;
     final int UART_MODE = 1;
     final int AIR_UART_MODE = 2;
+    final int AIR_HCI_MODE = 3;
     int TESTMODE;
 
     final String FAIL = "FAIL";
@@ -4397,7 +4398,100 @@ public class AllTestclass extends AppCompatActivity {
         return true;
     }
 
+    public int AIR_HCI_BD_NameWrite(BLE_testItem testItem) {
+        Current_TEST_NAME = BD_TEST_NAME_WRITE;
 
+        write2_MainUI_Log(0, "S=====" + testItem.gettestName());
+
+        if (!test_air_hci_namewrite(testItem)) {
+            write2_MainUI_Log(2, Current_TEST_NAME + " test fail");
+            ((MainActivity) mcontext).updateFailCnt();
+        } else {
+            write2_MainUI_Log(0, Current_TEST_NAME + " test success");
+            ((MainActivity) mcontext).updatesuccesstv();
+        }
+
+        //disconnect no matter success or fail
+        bleServiceInstance.disconnect();
+        SystemClock.sleep(3000);
+
+        write2_MainUI_Log(0, "E=====" + testItem.gettestName());
+
+        return 0;
+    }
+
+    public boolean test_air_hci_namewrite(BLE_testItem testitem) {
+
+        write2_MainUI_Log(0, "*****" + testitem.gettestName() + ",data is " + testitem.getdataStr());
+        setDefaultBleData();
+        //set ble name from config
+        setBleData(testitem.getdataStr());
+
+        //=====================connection======================
+        if (commonutil.config.BLE) {
+            bleServiceInstance = ((MainActivity) mcontext).getBleServiceInstance();
+            if (null == bleServiceInstance) {
+                commonutil.wdbgLogcat(TAG, 2, "bleServiceInstance is null, ble service not start yet ?");
+                return false;
+            }
+
+            //check connect or not, retry connect 3 times if connection fail
+            if (!bleServiceInstance.isConnected()) {
+                if (!connectRetry()) {
+                    return false;
+                }
+            }
+
+            //=====================enable notify======================
+            bleServiceInstance.setCharacteristicNotify(SERVICE_UUID, NOTIFY_CHARA_UUID, WRITE_DESCRIPTOR_UUID);
+            SystemClock.sleep(2000);
+
+            while (testitem.cmdSize() > 0) {
+                //clear last event
+                bleServiceInstance.clearCharChagedstr();
+
+                String cmd = testitem.getCmd().split(":")[0];
+                String evt = testitem.getCmd().split(":")[1];
+
+                commonutil.wdbgLogcat(TAG, 0, "cmd:" + cmd + "evt:" + evt);
+                byte[] bytes = ((MainActivity) mcontext).string2Bytes(cmd);
+                writeAirCmd(bytes);
+
+
+                //check write evt string is correct or not
+                String revEvt = bleServiceInstance.getCharChagedstr();
+                if (revEvt.equals(evt)) {
+                    write2_MainUI_Log(0, "OK evt ,revEvt:" + revEvt);
+                } else {
+                    write2_MainUI_Log(2, "fail evt ,revEvt:" + revEvt);
+                    return false;
+                }
+
+                testitem.popCmd();
+            }
+
+            //disconnect
+            bleServiceInstance.disconnect();
+            SystemClock.sleep(3000);
+
+            //-------------------scan
+            long scanTime = 5000;
+            //start scan
+            scanLeDevice(true);
+            //wait finish
+            SystemClock.sleep(scanTime);
+            //-------------------stop scan
+            scanLeDevice(false);
+
+            //check if the name we modify exist
+            if (!getFindBleDataFlag()) {
+                commonutil.wErrLog("can not find ble name:" + testitem.getdataStr());
+                return false;
+            }
+
+        }
+        return true;
+    }
 
     private void parseAdv(byte[] adv_data) {
         if (adv_data.length == 0) {

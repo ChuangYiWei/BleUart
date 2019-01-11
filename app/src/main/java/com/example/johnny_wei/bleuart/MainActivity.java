@@ -664,12 +664,14 @@ public class MainActivity extends AppCompatActivity {
         try {
             InputStream in_stream = asset.open("76xx.xml");
             String mode = "";
-            if (0 == GetTestMode()) {
-                mode = "SPI";
-            } else if(1 == GetTestMode()){
-                mode = "UART";
-            }else {
-                mode = "AIR_CMD";
+            if (globalConfig.SPI_MODE == GetTestMode()) {
+                mode = globalConfig.SPI_XML_TAG;
+            } else if(globalConfig.UART_MODE == GetTestMode()){
+                mode = globalConfig.UART_XML_TAG;
+            }else if(globalConfig.AIR_UART_MODE == GetTestMode()){
+                mode = globalConfig.AIR_UART_XML_TAG;
+            }else if(globalConfig.AIR_HCI_MODE == GetTestMode()){
+                mode = globalConfig.AIR_HCI_XML_TAG;
             }
 
             List<BLE_testItem> list = XmlParser.getTestItems(in_stream, mode);
