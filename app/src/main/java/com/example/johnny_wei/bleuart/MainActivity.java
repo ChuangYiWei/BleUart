@@ -43,7 +43,6 @@ import com.example.johnny_wei.bleuart.xmlpull.XmlParser;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -175,13 +174,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    private String[] testModeArray = {"SPI mode","UART mode", "AIR CMD mode"};
     int modeIdx = 0;
     public void setupSpinner(){
         Spinner spinner = (Spinner) findViewById(R.id.spinner);
         //建立一個ArrayAdapter物件，並放置下拉選單的內容
 
-        ArrayAdapter adapter = new ArrayAdapter(this,android.R.layout.simple_spinner_item,testModeArray);
+        ArrayAdapter adapter = new ArrayAdapter(this, android.R.layout.simple_spinner_item, globalConfig.testModeArray);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
         spinner.setOnItemSelectedListener(new Spinner.OnItemSelectedListener(){
@@ -195,7 +193,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    //return mode index,//0:spi, 1:uart, 2:air_uart
+    //return mode index,//0:spi, 1:uart, 2:air_uart, 3:hci_air_uart
     public int GetTestMode(){
         return modeIdx;
     }
