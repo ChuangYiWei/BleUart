@@ -637,6 +637,26 @@
             <!--<cmd>2033:2133060A8967452301</cmd>-->
         <!--</item>-->
 
+        <!--++++++++++++++++++++IntvLatencyWrite2Cmd -->
+        <!--read : 0x213004 + Connection Interval (4 bytes, Unit: 1ms, Valid Range=8~4000, LSB)-->
+        <!--沒連線時tx event只會收到63263015(fail)-->
+        <!--沒連線時rx event只會6721300400000000(val為0)-->
+        <!--write: 0x25 0x40 0x08(fixed length) Only available when connected.-->
+        <!--[I=150~200ms.L=0]/[I=10~20ms.L=0]-->
+        <item>
+            <func_name>AIR_BD_IntvLatencyWrite</func_name>
+            <data>80</data>
+            <cmd>2540084000500000005802:263000</cmd>
+            <cmd>2030:213004C6000000</cmd>
+        </item>
+        <item>
+            <func_name>AIR_BD_IntvLatencyWrite</func_name>
+            <data>10</data>
+            <cmd>2540080800100000005802:263000</cmd>
+            <cmd>2030:21300412000000</cmd>
+        </item>
+
+
         <!--++++++++++++++++++++AdvIntvWriteCmd
     Adv Interval (Unit: 1 ms, Valid Range=20~10000,LSB) , data 0 means pass-->
         <!--1000ms-->
@@ -705,8 +725,10 @@
             <cmd>2031:21310131</cmd>
         </item>
 
+
+
         <!--4++++++++++++++++++++AdvDataWriteCmd Length (up to 25 bytes), “Manufacturer Specific Data-->
-        <!--&lt;!&ndash;[write 20 byte]&ndash;&gt;-->
+        <!--[write 20 byte]-->
 
         [write 3 byte]
         <item>
@@ -715,8 +737,6 @@
             <cmd>253603010203:263600</cmd>
             <cmd>2036:213603010203</cmd>
         </item>
-        <!--[write 26 byte over 25(max) byte] 只寫25 byte-->
-
 
         <!--4++++++++++++++++++++WhiteListWriteCmd Connectable device address – white list(6 bytes, LSB)-->
         <!--0:means all devices can connect-->
@@ -732,15 +752,6 @@
             <cmd>25380100:263800</cmd>
             <cmd>2038:21380100</cmd>
         </item>
-        <!--[write val 1(0dbm) and 0(3dbm)]-->
-        <!--<item>-->
-        <!--<func_name>AIR_BD_TxPowerWrite</func_name>-->
-        <!--<data>0:3</data>-->
-        <!--<cmd>25380101:263800</cmd>-->
-        <!--<cmd>2038:21380101</cmd>-->
-        <!--<cmd>25380100:263800</cmd>-->
-        <!--<cmd>2038:21380100</cmd>-->
-        <!--</item>-->
 
         <!--++++++++++++++++++++BatteryLevelWriteCmd -->
         <item>
@@ -755,27 +766,8 @@
             <cmd>253B0130:263B00</cmd>
         </item>
 
-        <!--++++++++++++++++++++IntvLatencyWrite2Cmd -->
-        <!--read : 0x213004 + Connection Interval (4 bytes, Unit: 1ms, Valid Range=8~4000, LSB)-->
-        <!--沒連線時tx event只會收到63263015(fail)-->
-        <!--沒連線時rx event只會6721300400000000(val為0)-->
-        <!--write: 0x25 0x40 0x08(fixed length) Only available when connected.-->
-        <!--[I=150~200ms.L=0]/[I=10~20ms.L=0]-->
-        <item>
-            <func_name>AIR_BD_IntvLatencyWrite</func_name>
-            <data>150</data>
-            <cmd>2540087800A00000005802:263000</cmd>
-            <cmd>2030:213004C6000000</cmd>
-        </item>
-        <item>
-            <func_name>AIR_BD_IntvLatencyWrite</func_name>
-            <data>10</data>
-            <cmd>2540080800100000005802:263000</cmd>
-            <cmd>2030:21300412000000</cmd>
-        </item>
         <!--++++++++++++++++++++AdvDataWrite2Cmd -->
         <!--(up to 31 bytes, whole Advertising Data field value, MSB)-->
-        <!--fixed len: 31 byte-->
 
         <!--[write len=14]-->
         <item>
@@ -856,4 +848,5 @@
             <cmd>560194042000:57010000940420000400B0A0</cmd>
         </item>
     </AIR_CMD>
+
 </BC76xx>
