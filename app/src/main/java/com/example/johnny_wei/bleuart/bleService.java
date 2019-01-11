@@ -13,7 +13,9 @@ import android.bluetooth.BluetoothProfile;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Binder;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
 import android.os.SystemClock;
 import android.util.Log;
 
@@ -23,6 +25,8 @@ import java.lang.reflect.Method;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
+
+import static com.example.johnny_wei.bleuart.MainActivity.mUIHandler;
 
 public class bleService extends Service {
     //ble
@@ -54,6 +58,7 @@ public class bleService extends Service {
     private final IBinder mBinder = new MyBinder();
     String TAG = this.getClass().getSimpleName();
 
+    Context ctx_bleservice = this;
 
     String g_charChagedstr;
     String g_charReadstr;
@@ -97,18 +102,25 @@ public class bleService extends Service {
     @Override
     public void onDestroy() {
         Log.w(TAG, "destroy service.");
-        if (mBluetoothGatt != null) {
-            mBluetoothGatt.disconnect();
-        }
-
-        if (mBluetoothGatt != null) {
-            mBluetoothGatt.close();
-            mBluetoothGatt = null;
-        }
+        mUIHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                if (mBluetoothGatt != null) {
+                    mBluetoothGatt.disconnect();
+                }
+                if (mBluetoothGatt != null) {
+                    mBluetoothGatt.close();
+                    mBluetoothGatt = null;
+                }
+            }
+        });
+        SystemClock.sleep(500);
         super.onDestroy();
     }
 
+    private boolean flag;
     public boolean connect(final String address) {
+
         commonutil.wdbgLogcat(TAG,0,"=>connect to " + address);
 
         if (mBluetoothAdapter == null || address == null) {
@@ -120,12 +132,24 @@ public class bleService extends Service {
                 && address.equals(mBluetoothDeviceAddress)
                 && mBluetoothGatt != null) {
             commonutil.wdbgLogcat(TAG,0,"Trying to use an existing mBluetoothGatt for connection.");
-            if (mBluetoothGatt.connect()) {
-                mConnectionState = STATE_CONNECTING;
-                return true;
-            } else {
-                commonutil.wdbgLogcat(TAG,2,"mBluetoothGatt.connect() fail");
+
+            mUIHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    if (mBluetoothGatt.connect()) {
+                        mConnectionState = STATE_CONNECTING;
+                        flag = true;
+                    } else {
+                        commonutil.wdbgLogcat(TAG,2,"mBluetoothGatt.connect() fail");
+                        flag = false;
+                    }
+                }
+            });
+            SystemClock.sleep(200);
+            if (!flag) {
                 return false;
+            } else {
+                return true;
             }
         }
 
@@ -135,8 +159,13 @@ public class bleService extends Service {
             commonutil.wdbgLogcat(TAG,2,"there is no device");
             return false;
         }
-        // We want to directly connect to the device, so we are setting the autoConnect parameter to false.
-        mBluetoothGatt = device.connectGatt(this, false, mGattCallback);
+
+        mUIHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                mBluetoothGatt = device.connectGatt(ctx_bleservice, false, mGattCallback);
+            }
+        });
 
         //can't fix gatt error
         //mBluetoothGatt = (new BleConnectionCompat(this)).connectGatt(device, false, mGattCallback);
@@ -165,16 +194,23 @@ public class bleService extends Service {
 
     public boolean refreshGatt()
     {
-        try {
-            Method localMethod = mBluetoothGatt.getClass().getMethod("refresh");
-            if (localMethod != null) {
-                commonutil.wdbgLogcat(TAG,1, "refresh gatt");
-                return (Boolean) localMethod.invoke(mBluetoothGatt);
+        mUIHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Method localMethod = mBluetoothGatt.getClass().getMethod("refresh");
+                    if (localMethod != null) {
+                        commonutil.wdbgLogcat(TAG, 1, "refresh gatt");
+                        flag = (boolean)localMethod.invoke(mBluetoothGatt);
+                    }
+                } catch (Exception localException) {
+                    commonutil.wdbgLogcat(TAG, 2, "An exception occured while refreshing device");
+                    flag = false;
+                }
             }
-        } catch (Exception localException) {
-            commonutil.wdbgLogcat(TAG,2, "An exception occured while refreshing device");
-        }
-        return false;
+        });
+        SystemClock.sleep(200);
+        return flag;
     }
 
     public boolean isConnected() {
@@ -203,14 +239,20 @@ public class bleService extends Service {
             commonutil.wdbgLogcat(TAG, 2, "BluetoothAdapter not initialized");
             return;
         }
-        if(!refreshGatt()) {
+        if (!refreshGatt()) {
             commonutil.wdbgLogcat(TAG, 2, "gatt refresh fail");
         }
 
-        mBluetoothGatt.disconnect();
-        mConnectionState = STATE_DISCONNECTED;
-        mBluetoothGatt.close();
-        mBluetoothGatt = null;
+        mUIHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                if (mBluetoothGatt != null)
+                    mBluetoothGatt.disconnect();
+                mBluetoothGatt.close();
+                mConnectionState = STATE_DISCONNECTED;
+                mBluetoothGatt = null;
+            }
+        });
     }
 
     public boolean rebootBluetooth() {
@@ -236,7 +278,12 @@ public class bleService extends Service {
             if (status == BluetoothGatt.GATT_SUCCESS) {
                 if (newState == BluetoothProfile.STATE_CONNECTED) {
                     commonutil.wdbgLogcat(TAG, 1, "Connected to GATT server. Attempting to start service discovery");
-                    mBluetoothGatt.discoverServices();
+                    mUIHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            mBluetoothGatt.discoverServices();
+                        }
+                    });
                     mConnectionState = STATE_CONNECTED;
                 } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
                     mConnectionState = STATE_DISCONNECTED;

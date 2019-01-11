@@ -77,7 +77,7 @@ public class MainActivity extends AppCompatActivity {
     //common
     String TAG = getClass().getSimpleName();
     private Handler m_userHandler;
-    private Handler mUIHandler;
+    static public Handler mUIHandler;
     Activity thisActivity = this;
 
     //layout

@@ -3831,7 +3831,8 @@ public class AllTestclass extends AppCompatActivity {
                     db_List.add(getAvgRssi());
                     clearRssiList();
 
-                    SystemClock.sleep(500);
+                    //workaroud to pervent gatt 133 error
+                    SystemClock.sleep(1000);
                 }
                 testitem.popCmd();
             }
