@@ -184,7 +184,7 @@ public class AllTestclass extends AppCompatActivity {
                              byte[] scanRecord) {
 
         String name = device.getName();
-        //Log.d(TAG, "device name:" + device.getName() + ", device address:" + device.getAddress() + Integer.toString(rssi));
+//      Log.d(TAG, "device name:" + device.getName() + ", device address:" + device.getAddress() + Integer.toString(rssi));
         //jjj for test
         if (name != null && device.getAddress().equals("20:18:10:31:17:56")) {
             parseAdv(scanRecord);
@@ -198,7 +198,7 @@ public class AllTestclass extends AppCompatActivity {
 
 
         //the last test item of test_addr will set default
-        if (name != null && device.getAddress().equals(defaultBleAddr)) {
+        if (name != null && device.getAddress().equals(curBleAddr)) {
             //write2MainUI("scan AD Data");
             //Log.d(TAG, "device name:" + device.getName() + ", device address:" + device.getAddress() + Integer.toString(rssi));
             //parseAdv(scanRecord);
@@ -4453,7 +4453,7 @@ public class AllTestclass extends AppCompatActivity {
                 String cmd = testitem.getCmd().split(":")[0];
                 String evt = testitem.getCmd().split(":")[1];
 
-                commonutil.wdbgLogcat(TAG, 0, "cmd:" + cmd + "evt:" + evt);
+                commonutil.wdbgLogcat(TAG, 0, "cmd:" + cmd + " ,evt:" + evt);
                 byte[] bytes = ((MainActivity) mcontext).string2Bytes(cmd);
                 writeAirCmd(bytes);
 
@@ -4485,13 +4485,60 @@ public class AllTestclass extends AppCompatActivity {
 
             //check if the name we modify exist
             if (!getFindBleDataFlag()) {
-                commonutil.wErrLog("can not find ble name:" + testitem.getdataStr());
+                write2_MainUI_Log(2, "can not find ble name:" + testitem.getdataStr());
                 return false;
             }
 
         }
         return true;
     }
+
+    public int HCI_AIR_AddrWrite(BLE_testItem testItem) {
+        Current_TEST_NAME = BD_TEST_ADDR_WRITE;
+
+        write2_MainUI_Log(0, "S=====" + testItem.gettestName());
+
+        //use same func because of same behavior
+        if (!test_air_hci_namewrite(testItem)) {
+            write2_MainUI_Log(2, Current_TEST_NAME + " test fail");
+            ((MainActivity) mcontext).updateFailCnt();
+        } else {
+            write2_MainUI_Log(0, Current_TEST_NAME + " test success");
+            ((MainActivity) mcontext).updatesuccesstv();
+        }
+
+        //disconnect no matter success or fail
+        bleServiceInstance.disconnect();
+        SystemClock.sleep(3000);
+
+        write2_MainUI_Log(0, "E=====" + testItem.gettestName());
+
+        return 0;
+    }
+
+    public int HCI_AIR_TxPowerWrite(BLE_testItem testItem) {
+        Current_TEST_NAME = BD_TEST_TXPOWER_WRITE;
+
+        write2_MainUI_Log(0, "S=====" + testItem.gettestName());
+
+        //todo:change to txpower func
+        if (!test_air_hci_namewrite(testItem)) {
+            write2_MainUI_Log(2, Current_TEST_NAME + " test fail");
+            ((MainActivity) mcontext).updateFailCnt();
+        } else {
+            write2_MainUI_Log(0, Current_TEST_NAME + " test success");
+            ((MainActivity) mcontext).updatesuccesstv();
+        }
+
+        //disconnect no matter success or fail
+        bleServiceInstance.disconnect();
+        SystemClock.sleep(3000);
+
+        write2_MainUI_Log(0, "E=====" + testItem.gettestName());
+
+        return 0;
+    }
+
 
     private void parseAdv(byte[] adv_data) {
         if (adv_data.length == 0) {
