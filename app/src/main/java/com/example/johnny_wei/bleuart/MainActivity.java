@@ -699,42 +699,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void invokeTest() throws IllegalAccessException {
-        AssetManager asset = getAssets();
-        Log.d(TAG, "invokeTest start");
-        //parse test function
-        testFuncList.clear();
-        try {
-            InputStream input = asset.open("bd_testfuncs.xml");
-            List<BDTestitem> list = Parserfuncs.getTestFunctions(input);
-            for (BDTestitem item : list) {
-                testFuncList.add(item.getName());
-                Log.d(TAG,item.getName());
-            }
-        } catch (Throwable e) {
-            e.printStackTrace();
-        }
-
-        while(testFuncList.size() > 0 && isThreadRunning()) {
-            Log.d(TAG, "---------------------" + testFuncList.getFirst());
-            writeStatus(testFuncList.getFirst());
-            Method method;
-            try {
-                //call function in bd_obj class
-                method = bd_obj.getClass().getDeclaredMethod(testFuncList.getFirst());
-                method.invoke(bd_obj);
-
-            } catch (NoSuchMethodException e) {
-                e.printStackTrace();
-            } catch (InvocationTargetException e) {
-                e.printStackTrace();
-            }
-            testFuncList.removeFirst();
-        }
-        Log.d(TAG, "test done");
-
-    }
-
     public byte[] string2Bytes(String inString){
         return string2Bytes(inString,0x00);
     }
