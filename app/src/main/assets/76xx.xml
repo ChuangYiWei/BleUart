@@ -850,6 +850,7 @@
     </AIR_UART_CMD>
 
     <AIR_HCI_CMD>
+
         <!--write 1 byte 1-->
         <item>
             <func_name>AIR_HCI_BD_NameWrite</func_name>
@@ -871,5 +872,13 @@
             <data>0</data>
             <cmd>01072000:040E050107200000</cmd>
         </item>
+        <!--disconnect -->
+        <item>
+            <func_name>HCI_AIR_BD_DisconnectWrite</func_name>
+            <data>0</data>
+            <cmd>01060403030013:NA</cmd>
+        </item>
+
+
     </AIR_HCI_CMD>>
 </BC76xx>

@@ -4539,6 +4539,29 @@ public class AllTestclass extends AppCompatActivity {
         return 0;
     }
 
+    public int HCI_AIR_BD_DisconnectWrite(BLE_testItem testItem) {
+        Current_TEST_NAME = BD_TEST_DISCONN_WRITE;
+
+        write2_MainUI_Log(0, "S=====" + testItem.gettestName());
+
+        //todo:change func as we sure the right behavior
+        if (!test_air_disconnectwrite2(testItem)) {
+            write2_MainUI_Log(2, Current_TEST_NAME + " test fail");
+            ((MainActivity) mcontext).updateFailCnt();
+        } else {
+            write2_MainUI_Log(0, Current_TEST_NAME + " test success");
+            ((MainActivity) mcontext).updatesuccesstv();
+        }
+
+        //disconnect no matter success or fail
+        bleServiceInstance.disconnect();
+        SystemClock.sleep(3000);
+
+        write2_MainUI_Log(0, "E=====" + testItem.gettestName());
+
+        return 0;
+    }
+
 
     private void parseAdv(byte[] adv_data) {
         if (adv_data.length == 0) {
