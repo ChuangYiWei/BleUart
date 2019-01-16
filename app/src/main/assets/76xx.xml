@@ -851,12 +851,12 @@
 
     <AIR_HCI_CMD>
 
-        <!--write 1 byte 1-->
+        <!--write name 12  -->
         <item>
             <func_name>AIR_HCI_BD_NameWrite</func_name>
-            <data>1</data>
-            <cmd>01130C0131:040E0401130C00</cmd>
-            <cmd>01140C00:040E0501140C0031</cmd>
+            <data>12</data>
+            <cmd>01130C023132:040E0401130C00</cmd>
+            <cmd>01140C00:040E0601140C003132</cmd>
         </item>
 
         <!--read addr -->
@@ -872,6 +872,7 @@
             <data>0</data>
             <cmd>01072000:040E050107200000</cmd>
         </item>
+
         <!--disconnect -->
         <item>
             <func_name>HCI_AIR_BD_DisconnectWrite</func_name>
@@ -879,6 +880,35 @@
             <cmd>01060403030013:NA</cmd>
         </item>
 
+        <!--adv data -->
+        <item>
+            <func_name>HCI_AIR_BD_AdvDataWrite2</func_name>
+            <data>020105</data>
+            <cmd>0108200403020105:040E0401082000</cmd>
+        </item>
+
+        <!--scan res data -->
+        <item>
+            <func_name>HCI_AIR_BD_ScanResDataWrite</func_name>
+            <data>0201060409383838</data>
+            <cmd>01092009080201060409383838:040E0401092000</cmd>
+        </item>
+
+        <!--set adv para -->
+        <!---->
+        <item>
+            <func_name>HCI_AIR_BD_IntvWrite</func_name>
+            <data>20</data>
+            <cmd>0106200F100020000000000A89674523010700:040E0401062000</cmd>
+        </item>
+
+        <!--set conn interval -->
+        <item>
+            <!--80~100-->
+            <func_name>HCI_AIR_IntvLatencyWrite</func_name>
+            <data>80</data>
+            <cmd>0113200C400050000000D00700000000:040f0400011320</cmd>
+        </item>
 
     </AIR_HCI_CMD>>
 </BC76xx>
