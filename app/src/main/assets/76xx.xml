@@ -862,16 +862,16 @@
         <!--read addr -->
         <item>
             <func_name>HCI_AIR_AddrWrite</func_name>
-            <data>01:23:45:67:89:0A</data>
-            <cmd>01091000:040E0A010910000A8967452310</cmd>
+            <data>20:18:11:30:18:34</data>
+            <cmd>01091000:040E0A01091000341830111820</cmd>
         </item>
 
-        <!--tx power -->
-        <item>
-            <func_name>HCI_AIR_TxPowerWrite</func_name>
-            <data>0</data>
-            <cmd>01072000:040E050107200000</cmd>
-        </item>
+        <!--&lt;!&ndash;tx power &ndash;&gt;-->
+        <!--<item>-->
+            <!--<func_name>HCI_AIR_TxPowerWrite</func_name>-->
+            <!--<data>0</data>-->
+            <!--<cmd>01072000:040E050107200000</cmd>-->
+        <!--</item>-->
 
         <!--disconnect -->
         <item>
