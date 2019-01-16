@@ -2540,7 +2540,8 @@ public class AllTestclass extends AppCompatActivity {
 
         write2_MainUI_Log(0, "S=====" + testItem.gettestName());
 
-        if (!test_air_hci_namewrite(testItem)) {
+        //todo:check if we can use this func
+        if (!test_air_namewrite2(testItem)) {
             write2_MainUI_Log(2, Current_TEST_NAME + " test fail");
             ((MainActivity) mcontext).updateFailCnt();
         } else {
@@ -2636,7 +2637,7 @@ public class AllTestclass extends AppCompatActivity {
         write2_MainUI_Log(0, "S=====" + testItem.gettestName());
 
         //use same func because of same behavior
-        if (!test_air_hci_namewrite(testItem)) {
+        if (!test_air_addrwrite2(testItem)) {
             write2_MainUI_Log(2, Current_TEST_NAME + " test fail");
             ((MainActivity) mcontext).updateFailCnt();
         } else {
@@ -2705,7 +2706,7 @@ public class AllTestclass extends AppCompatActivity {
         write2_MainUI_Log(0, "S=====" + testItem.gettestName());
 
         //todo:change func as we sure the right behavior
-        if (!test_air_hci_namewrite(testItem)) {
+        if (!test_air_advdata2write2(testItem)) {
             write2_MainUI_Log(2, Current_TEST_NAME + " test fail");
             ((MainActivity) mcontext).updateFailCnt();
         } else {
@@ -2728,7 +2729,7 @@ public class AllTestclass extends AppCompatActivity {
         write2_MainUI_Log(0, "S=====" + testItem.gettestName());
 
         //todo:change func as we sure the right behavior
-        if (!test_air_hci_namewrite(testItem)) {
+        if (!test_air_advdata2write2(testItem)) {
             write2_MainUI_Log(2, Current_TEST_NAME + " test fail");
             ((MainActivity) mcontext).updateFailCnt();
         } else {
@@ -2751,7 +2752,7 @@ public class AllTestclass extends AppCompatActivity {
         write2_MainUI_Log(0, "S=====" + testItem.gettestName());
 
         //todo:change func as we sure the right behavior
-        if (!test_air_hci_namewrite(testItem)) {
+        if (!test_air_IntvLantencywrite2(testItem)) {
             write2_MainUI_Log(2, Current_TEST_NAME + " test fail");
             ((MainActivity) mcontext).updateFailCnt();
         } else {
