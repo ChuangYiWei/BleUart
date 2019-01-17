@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">BleUart</string>
+    <string name="Connected">Connected</string>
+    <string name="not_connected">Not connected</string>
 </resources>

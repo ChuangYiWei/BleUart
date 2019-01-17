@@ -40,10 +40,6 @@ public class bleService extends Service {
     private static final int STATE_CONNECTING = 1;
     private static final int STATE_CONNECTED = 2;
 
-    public final static String ACTION_GATT_CONNECTED = "ACTION_GATT_CONNECTED";
-    public final static String ACTION_GATT_DISCONNECTED = "ACTION_GATT_DISCONNECTED";
-    public final static String ACTION_GATT_SERVICES_DISCOVERED = "ACTION_GATT_SERVICES_DISCOVERED";
-
     public final static String ACTION_GATT_CHARA_DATA_READ = "ACTION_GATT_CHARA_DATA_READ";
     public final static String ACTION_GATT_CHARA_DATA_WRITE = "ACTION_GATT_CHARA_DATA_WRITE";
     public final static String ACTION_GATT_CHARA_DATA_CHANGE = "ACTION_GATT_CHARA_DATA_CHANGE";
@@ -189,7 +185,9 @@ public class bleService extends Service {
             commonutil.wdbgLogcat(TAG,1,"BluetoothAdapter not initialized");
             return;
         }
+
         resetConnectState();
+        broadcastUpdate(globalConfig.ACTION_GATT_DISCONNECTED);
     }
 
     public boolean refreshGatt()
@@ -268,9 +266,7 @@ public class bleService extends Service {
         return true;
     }
 
-    static final int GATT_CONN_TERMINATE_LOCAL_HOST = 0x16;
-    static final int GATT_CONN_TIMEOUT = 0x08;
-    static final int GATT_INTERNAL_ERROR = 0x81;//129
+
     /*gatt callback*/
     private final BluetoothGattCallback mGattCallback = new BluetoothGattCallback() {
         @Override
@@ -285,21 +281,22 @@ public class bleService extends Service {
                         }
                     });
                     mConnectionState = STATE_CONNECTED;
+                    broadcastUpdate(globalConfig.ACTION_GATT_CONNECTED);
                 } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
                     mConnectionState = STATE_DISCONNECTED;
                     commonutil.wdbgLogcat(TAG, 1, "Disconnected from GATT server.");
+                    broadcastUpdate(globalConfig.ACTION_GATT_DISCONNECTED);
                 }
-            } else if (status == GATT_CONN_TERMINATE_LOCAL_HOST) {
-                //android may reconnect if BT is already disconnect
-                commonutil.wdbgLogcat(TAG, 1, "GATT_CONN_TERMINATE_LOCAL_HOST, resetConnectState !");
-                resetConnectState();
-            } else if (status == GATT_CONN_TIMEOUT) {
-                //android may reconnect if BT is already disconnect
-                commonutil.wdbgLogcat(TAG, 1, "GATT_CONN_TIMEOUT!, resetConnectState !");
-                resetConnectState();
             } else {
-                commonutil.wdbgLogcat(TAG, 2, "onConnectionStateChange received: " + status);
-                commonutil.wdbgLogcat(TAG, 1, "resetConnectState !");
+                broadcastUpdate(globalConfig.ACTION_GATT_DISCONNECTED);
+                //handle other status, android may reconnect if BT is already disconnect
+                if (status == globalConfig.GATT_CONN_TERMINATE_LOCAL_HOST) {
+                    commonutil.wdbgLogcat(TAG, 1, "GATT_CONN_TERMINATE_LOCAL_HOST, resetConnectState !");
+                } else if (status == globalConfig.GATT_CONN_TIMEOUT) {
+                    commonutil.wdbgLogcat(TAG, 1, "GATT_CONN_TIMEOUT!");
+                } else {
+                    commonutil.wdbgLogcat(TAG, 2, "onConnectionStateChange received: " + status);
+                }
                 resetConnectState();
             }
         }
@@ -308,8 +305,8 @@ public class bleService extends Service {
         public void onServicesDiscovered(BluetoothGatt gatt, int status) {
             commonutil.wdbgLogcat(TAG, 1, "onServicesDiscovered.");
             if (BluetoothGatt.GATT_SUCCESS == status) {
-                broadcastUpdate(ACTION_GATT_SERVICES_DISCOVERED);
-            } else if (status == GATT_INTERNAL_ERROR) {
+                broadcastUpdate(globalConfig.ACTION_GATT_SERVICES_DISCOVERED);
+            } else if (status == globalConfig.GATT_INTERNAL_ERROR) {
                 commonutil.wdbgLogcat(TAG, 2, "GATT_INTERNAL_ERROR!");
             } else {
                 commonutil.wdbgLogcat(TAG, 2, "onServicesDiscovered error status : " + status);
@@ -614,6 +611,7 @@ public class bleService extends Service {
 
     private void broadcastUpdate(final String action) {
         final Intent intent = new Intent(action);
+        intent.putExtra(globalConfig.EXTRAS_ADDR, mBluetoothDeviceAddress);
         sendBroadcast(intent);
     }
 

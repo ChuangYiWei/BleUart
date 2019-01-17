@@ -7,10 +7,12 @@ import android.app.AlertDialog;
 import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothManager;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
@@ -84,6 +86,7 @@ public class MainActivity extends AppCompatActivity {
     TextView tv_fail;
     TextView tv_time;
     TextView tv_status;
+    TextView tv_addr;
     EditText ed_uart;
     static int successCnt;
     static int failCnt;
@@ -135,7 +138,37 @@ public class MainActivity extends AppCompatActivity {
 
         openBleService();
 
+        //register event
+        registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
+
     }
+
+    @Override
+    protected void onResume() {
+
+        super.onResume();
+        mUIHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                setBaudRate(mBaudratei115200);
+            }
+        }, 500);
+    }
+
+    @Override
+    protected void onDestroy() {
+        m_userHandler.removeCallbacks(invokeRun);
+        unbindService(mLoaclServiceConnection);
+        unregisterReceiver(mGattUpdateReceiver);
+
+        if (mSerial != null) {
+            mSerial.end();
+            mSerial = null;
+        }
+
+        super.onDestroy();
+    }
+
 
     private void init() {
 
@@ -163,6 +196,7 @@ public class MainActivity extends AppCompatActivity {
         ed_uart = findViewById(R.id.ed_uart);
         tv_time = findViewById(R.id.tv_time);
         tv_status = findViewById(R.id.tv_status);
+        tv_addr = findViewById(R.id.tv_addr);
         listView = findViewById(R.id.id_list);
         logString = new LinkedList<String>();
         adapter = new ArrayAdapter<String>(thisActivity, android.R.layout.simple_list_item_1, logString);
@@ -565,29 +599,7 @@ public class MainActivity extends AppCompatActivity {
         bindService(gattServiceIntent, mLoaclServiceConnection, Service.BIND_AUTO_CREATE);
     }
 
-    @Override
-    protected void onResume() {
 
-        super.onResume();
-        mUIHandler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                setBaudRate(mBaudratei115200);
-            }
-        }, 500);
-    }
-
-    @Override
-    protected void onDestroy() {
-        m_userHandler.removeCallbacks(invokeRun);
-        unbindService(mLoaclServiceConnection);
-        if (mSerial != null) {
-            mSerial.end();
-            mSerial = null;
-        }
-
-        super.onDestroy();
-    }
 
 
     public void clk_start(View view) {
@@ -685,7 +697,7 @@ public class MainActivity extends AppCompatActivity {
                     Log.w(TAG, "start test:" + item.gettestName());
                     method = bd_obj.getClass().getDeclaredMethod(item.gettestName(), BLE_testItem.class);
                     int ret = (int) method.invoke(bd_obj, item);
-                    Log.d(TAG, "ret:" + ret);
+                    //Log.d(TAG, "ret:" + ret);
                 } catch (NoSuchMethodException e) {
                     e.printStackTrace();
                 } catch (InvocationTargetException e) {
@@ -790,6 +802,15 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    public void writeUIAddr(final String log) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                tv_addr.setText(log);
+            }
+        });
+    }
+
     private void CountTimeThread() {
         Thread thread = new Thread() {
             int timeElapse = 0;
@@ -830,5 +851,28 @@ public class MainActivity extends AppCompatActivity {
     private void write2_MainUI_Log(int level, final String log) {
         String writedlog = commonutil.wdbgLogcat(TAG, level, log);
         writeLog2View(writedlog);
+    }
+
+    private final BroadcastReceiver mGattUpdateReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            final String action = intent.getAction();
+            if (globalConfig.ACTION_GATT_CONNECTED.equals(action)) {
+                writeStatus(getResources().getString(R.string.Connected));
+                writeUIAddr(intent.getStringExtra(globalConfig.EXTRAS_ADDR));
+            } else if (globalConfig.ACTION_GATT_SERVICES_DISCOVERED.equals(action)) {
+                //pass
+            } else if (globalConfig.ACTION_GATT_DISCONNECTED.equals(action)) {
+                writeStatus(getResources().getString(R.string.not_connected));
+            }
+        }
+    };
+
+    private static IntentFilter makeGattUpdateIntentFilter() {
+        final IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(globalConfig.ACTION_GATT_CONNECTED);
+        intentFilter.addAction(globalConfig.ACTION_GATT_DISCONNECTED);
+        intentFilter.addAction(globalConfig.ACTION_GATT_SERVICES_DISCOVERED);
+        return intentFilter;
     }
 }
