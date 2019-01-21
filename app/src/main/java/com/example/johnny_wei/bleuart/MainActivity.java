@@ -99,7 +99,6 @@ public class MainActivity extends AppCompatActivity {
     LinkedList<RowItem> rowItems;
 
     //for test
-    LinkedList<String> testFuncList;
     private static AllTestclass bd_obj;
 
     //uart setting
@@ -177,9 +176,6 @@ public class MainActivity extends AppCompatActivity {
         HandlerThread ht_thread = new HandlerThread("name");
         ht_thread.start();
         m_userHandler = new Handler(ht_thread.getLooper());
-
-        //functions under test
-        testFuncList = new LinkedList<String>();
 
         //invoke class
         bd_obj = new AllTestclass(this);
